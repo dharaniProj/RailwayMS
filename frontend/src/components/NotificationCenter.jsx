@@ -114,9 +114,9 @@ function NotificationCenter() {
       {/* Dropdown — opens to the RIGHT of the sidebar into main content */}
       {show && (
         <div style={{
-          position: 'fixed',
-          top: '64px',
-          left: '260px',      /* just past the sidebar edge */
+          position: 'absolute',
+          top: 'calc(100% + 10px)',
+          right: '0',
           width: '340px',
           maxHeight: '460px',
           overflowY: 'auto',
