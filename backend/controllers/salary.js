@@ -3,7 +3,7 @@ const db = require('../config/db');
 exports.getEmployeeSalaryHistory = async (req, res) => {
     try {
         const { employeeId } = req.params;
-        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY payment_date DESC', [employeeId]);
+        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY month_year DESC', [employeeId]);
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching salary history:', error);
@@ -14,7 +14,7 @@ exports.getEmployeeSalaryHistory = async (req, res) => {
 exports.getMySalaryHistory = async (req, res) => {
     try {
         const userId = req.user.id;
-        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY payment_date DESC', [userId]);
+        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY month_year DESC', [userId]);
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching own salary history:', error);
@@ -44,8 +44,8 @@ exports.generateSalary = async (req, res) => {
         const netSalary = (basicPay + hra + allowances) - deductions;
 
         const result = await db.query(
-            'INSERT INTO salary_history (employee_id, month_year, basic_pay, hra, allowances, deductions, net_salary) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            [employeeId, month_year, basicPay, hra, allowances, deductions, netSalary]
+            'INSERT INTO salary_history (employee_id, month_year, basic_pay, hra, allowances, deductions, net_salary, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [employeeId, month_year, basicPay, hra, allowances, deductions, netSalary, 'paid']
         );
 
         res.status(201).json(result.rows[0]);
