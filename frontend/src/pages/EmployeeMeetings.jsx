@@ -80,8 +80,8 @@ function EmployeeMeetings() {
                     boxShadow: '0 10px 30px rgba(47, 47, 143, 0.15)'
                 }}>
                     <div>
-                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', letterSpacing: '0.5px' }}>My Meetings & Conferences</h2>
-                        <p style={{ margin: '0.5rem 0 0 0', opacity: 0.9, fontSize: '0.95rem' }}>View your schedule, download agendas, and confirm your attendance.</p>
+                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', letterSpacing: '0.5px', color: '#ffffff' }}>My Meetings & Conferences</h2>
+                        <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#ffffff', opacity: 1 }}>View your schedule, download agendas, and confirm your attendance.</p>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <NotificationCenter />

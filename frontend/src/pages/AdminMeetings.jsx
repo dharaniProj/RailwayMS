@@ -145,8 +145,8 @@ function AdminMeetings() {
                     boxShadow: '0 10px 30px rgba(47, 47, 143, 0.15)'
                 }}>
                     <div>
-                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', letterSpacing: '0.5px' }}>Meetings & Conferences</h2>
-                        <p style={{ margin: '0.5rem 0 0 0', opacity: 0.9, fontSize: '0.95rem' }}>Schedule meetings, invite employees, and manage records.</p>
+                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', letterSpacing: '0.5px', color: '#ffffff' }}>Meetings & Conferences</h2>
+                        <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#ffffff', opacity: 1 }}>Schedule meetings, invite employees, and manage records.</p>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <NotificationCenter />
