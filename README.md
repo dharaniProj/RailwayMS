@@ -270,11 +270,11 @@ All routes are prefixed with `/api`:
 
 ## 🚀 Deployment
 
-This project is deployed **fully free** using:
+This project is deployed **fully** using:
 - **Frontend** → [Vercel](https://vercel.com) (auto-deploy on `git push`)
 - **Backend** → [Render](https://render.com) (Web Service, auto-deploy)
 - **Database** → [Neon](https://neon.tech) (serverless PostgreSQL)
-- **File Storage** → [Cloudinary](https://cloudinary.com) (free tier)
+- **File Storage** → [Cloudinary](https://cloudinary.com) (Document & Image storage)
 
 See `docs/DEPLOYMENT.md` for complete step-by-step deployment instructions.
 
@@ -282,4 +282,5 @@ See `docs/DEPLOYMENT.md` for complete step-by-step deployment instructions.
 
 ## 📄 License
 
-This project is built as an internal operations tool for educational/demonstration purposes.
+This project is developed by SuryaVanapalli14
+contact @ suryavanapalli14@gmail.com
