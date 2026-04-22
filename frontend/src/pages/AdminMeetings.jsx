@@ -3,7 +3,6 @@ import axios from 'axios';
 import API_BASE_URL from '../apiConfig';
 import Sidebar from '../components/Sidebar';
 import NotificationCenter from '../components/NotificationCenter';
-import { Link } from 'react-router-dom';
 
 function AdminMeetings() {
     const [meetings, setMeetings] = useState([]);

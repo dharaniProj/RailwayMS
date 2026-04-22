@@ -1,299 +1,183 @@
-# Project Details — Railway Management System
-
-A complete technical reference for developers.
-
----
+# 📚 Project Details — Railway Management System
 
 ## Overview
 
-The Railway Management System is a role-based web application designed to manage employee operations for a railway organization. It provides secure, separate portals for administrators and employees.
+The **Railway Management System (RailwayMS)** is a full-stack web application designed to digitise and streamline employee operations for an Indian Railways division. It replaces manual/paper-based processes with a secure, role-based digital platform.
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────┐       HTTP/REST       ┌────────────────────────┐
-│   React Frontend    │ ◄──────────────────► │  Node.js/Express API   │
-│   (Vite, SPA)       │                       │  (REST API Server)     │
-└─────────────────────┘                       └──────────┬─────────────┘
-                                                         │
-                              ┌──────────────────────────┤
-                              │                          │
-                   ┌──────────▼─────────┐    ┌──────────▼──────────┐
-                   │    PostgreSQL DB    │    │  Cloudinary Storage  │
-                   │  (metadata, users, │    │  (PDF, DOC, images)  │
-                   │   leaves, etc.)    │    │                       │
-                   └────────────────────┘    └──────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│                   CLIENT (Vercel)                   │
+│  React 18 SPA  →  React Router v6  →  Axios        │
+└───────────────────────┬─────────────────────────────┘
+                        │ HTTPS / REST API
+┌───────────────────────▼─────────────────────────────┐
+│                  BACKEND (Render)                   │
+│  Node.js + Express  →  JWT Auth  →  Multer          │
+└──────────┬─────────────────────────┬────────────────┘
+           │ SQL (pg pool)           │ Upload
+┌──────────▼──────────┐   ┌─────────▼──────────────────┐
+│  PostgreSQL (Neon)  │   │  Cloudinary (File Storage)  │
+└─────────────────────┘   └────────────────────────────┘
 ```
-
----
-
-## Technology Stack — Detailed
-
-### Frontend
-
-| Technology | Version | Purpose |
-|---|---|---|
-| React | 18 | UI component framework |
-| Vite | 5+ | Build tool and dev server |
-| React Router DOM | v6 | Client-side routing, protected routes |
-| Axios | latest | HTTP requests to backend API |
-| jsPDF | latest | PDF generation (payslips) |
-| jsPDF-AutoTable | latest | Table rendering in PDFs |
-| html2canvas | latest | HTML-to-image for PDF |
-| DOMPurify | latest | Sanitize HTML in announcements |
-
-### Backend
-
-| Technology | Version | Purpose |
-|---|---|---|
-| Node.js | 18+ | JavaScript runtime |
-| Express.js | 4 | Web framework / API routing |
-| pg (node-postgres) | latest | PostgreSQL client |
-| bcrypt | latest | Password hashing |
-| jsonwebtoken | latest | JWT creation and verification |
-| multer | latest | Multipart file upload handling |
-| cloudinary | latest | Cloud file storage (upload/delete) |
-| firebase-admin | latest | Firebase SDK (Auth, legacy) |
-| dotenv | latest | Environment variable management |
-| cors | latest | Cross-origin request handling |
-
-### Database
-
-| Technology | Purpose |
-|---|---|
-| PostgreSQL 14+ | Relational database for all data |
-
-### Cloud Services
-
-| Service | Purpose | Free Tier |
-|---|---|---|
-| Cloudinary | File storage (PDFs, images, docs) | 25 GB storage + bandwidth |
-| Firebase (optional) | Auth / legacy integration | Free Spark plan |
 
 ---
 
 ## Database Schema
 
-### `employees` table
-The core table storing all user accounts (both admin and employees).
+### Core Tables
 
-| Column | Type | Description |
-|---|---|---|
-| id | SERIAL PK | Internal auto ID |
-| employee_id | VARCHAR | Login username (e.g., EMP101) |
-| name | VARCHAR | Full name |
-| email | VARCHAR | Email address |
-| password | VARCHAR | bcrypt-hashed password |
-| role | VARCHAR | `admin` or `employee` |
-| phone_number | VARCHAR | Phone |
-| date_of_birth | DATE | Date of birth |
-| gender | VARCHAR | Gender |
-| marital_status | VARCHAR | Marital status |
-| department | VARCHAR | Department name |
-| designation | VARCHAR | Job title |
-| joining_date | DATE | Date joined |
-| employment_type | VARCHAR | Full-time, Contract, etc. |
-| work_location | VARCHAR | City/location |
-| salary | NUMERIC | Annual CTC |
-| aadhaar_number | VARCHAR | Aadhaar ID |
-| pan_number | VARCHAR | PAN card |
-| leave_count | INTEGER | Leaves taken |
-| is_first_login | BOOLEAN | Forces password change |
-| created_at | TIMESTAMP | Registration time |
+| Table | Purpose |
+|---|---|
+| `employees` | Master employee record — personal, employment, financial info |
+| `salary_records` | Monthly salary history per employee |
+| `leave_applications` | Leave requests with status tracking |
+| `transfers` | Employee inter-division transfer records |
+| `documents` | Document metadata — Cloudinary URL, file name, type |
+| `railway_passes` | Concessional travel pass records |
+| `announcements` | Broadcast notices from admin |
+| `notifications` | In-app notification feed |
+| `meetings` | Meeting schedule, type, agenda, MoM URL |
+| `meeting_participants` | Many-to-many: meetings ↔ employees + attendance status |
+| `meeting_documents` | Documents attached to specific meetings |
 
-### `documents` table
-Stores document metadata. Files are stored in Cloudinary.
+### Key Relationships
 
-| Column | Type | Description |
-|---|---|---|
-| doc_id | SERIAL PK | Document ID |
-| emp_id | INTEGER FK | References employees.id |
-| title | VARCHAR | Document label |
-| category | VARCHAR | Salary, Leave, ID Proof, etc. |
-| file_url | TEXT | Cloudinary HTTPS URL |
-| file_name | TEXT | Original filename |
-| file_type | VARCHAR | MIME type |
-| file_size | INTEGER | Bytes |
-| uploaded_by | VARCHAR | Uploader's employee_id |
-| storage_public_id | TEXT | Cloudinary public_id for deletion |
-| uploaded_at | TIMESTAMP | Upload time |
-
-### `leaves` table
-Tracks all leave applications and their approval status.
-
-| Column | Type | Description |
-|---|---|---|
-| id | SERIAL PK | Leave ID |
-| emp_id | INTEGER FK | Applicant employee |
-| subject | VARCHAR | Leave subject |
-| reason | TEXT | Detailed reason |
-| status | VARCHAR | `pending`, `approved`, `rejected` |
-| applied_at | TIMESTAMP | Application date |
-| start_date | DATE | Leave start |
-| end_date | DATE | Leave end |
-
-### `transfers` table
-Tracks transfer requests from employees.
-
-| Column | Type | Description |
-|---|---|---|
-| id | SERIAL PK | Transfer ID |
-| emp_id | INTEGER FK | Requesting employee |
-| current_location | VARCHAR | Current posting |
-| requested_location | VARCHAR | Desired location |
-| reason | TEXT | Reason for transfer |
-| status | VARCHAR | `pending`, `approved`, `rejected` |
-| applied_at | TIMESTAMP | Request date |
-
-### `announcements` table
-Admin-posted notices visible to all employees.
-
-| Column | Type | Description |
-|---|---|---|
-| id | SERIAL PK | Announcement ID |
-| title | VARCHAR | Headline |
-| content | TEXT | Full message (HTML allowed, sanitized) |
-| created_by | VARCHAR | Admin who posted it |
-| created_at | TIMESTAMP | Post time |
-
-### `salary_history` table
-Monthly payroll records for each employee.
-
-| Column | Type | Description |
-|---|---|---|
-| id | SERIAL PK | Record ID |
-| emp_id | INTEGER FK | Employee |
-| month | INTEGER | 1–12 |
-| year | INTEGER | e.g., 2026 |
-| gross_salary | NUMERIC | Before deductions |
-| deductions | NUMERIC | Total deductions |
-| net_salary | NUMERIC | Take-home pay |
-| generated_at | TIMESTAMP | When calculated |
-
-### `notifications` table
-System notifications delivered to employees.
-
-| Column | Type | Description |
-|---|---|---|
-| id | SERIAL PK | Notification ID |
-| emp_id | INTEGER FK | Target employee |
-| message | TEXT | Notification text |
-| type | VARCHAR | `leave`, `transfer`, `salary`, `general` |
-| is_read | BOOLEAN | Read status |
-| created_at | TIMESTAMP | When generated |
+- An employee can have **many** salary records, leaves, transfers, documents, railway passes.
+- A meeting has **many** participants and **many** attached documents.
+- Notifications are linked to individual employees.
 
 ---
 
-## API Endpoints
+## Authentication & Security
 
-### Auth
-| Method | Route | Access | Description |
-|---|---|---|---|
-| POST | /api/auth/login | Public | Login and receive JWT |
-
-### Employees
-| Method | Route | Access | Description |
-|---|---|---|---|
-| GET | /api/employees | Admin | List all employees |
-| GET | /api/employees/me | Any | Get own profile |
-| POST | /api/employees | Admin | Register new employee |
-| PUT | /api/employees/admin/profile | Admin | Update admin name/username/password |
-| PUT | /api/employees/:id/salary | Admin | Update employee salary |
-| POST | /api/employees/:id/reset-password | Admin | Reset employee password |
-| DELETE | /api/employees/:id | Admin | Delete employee |
-
-### Documents
-| Method | Route | Access | Description |
-|---|---|---|---|
-| POST | /api/documents/upload | Any auth | Upload a file to Cloudinary |
-| GET | /api/documents/all | Admin | All documents (filterable) |
-| GET | /api/documents/:emp_id | Self or Admin | Get employee's documents |
-| DELETE | /api/documents/:doc_id | Admin | Delete from Cloudinary + DB |
-
-### Leaves
-| Method | Route | Access | Description |
-|---|---|---|---|
-| POST | /api/leaves | Employee | Apply for leave |
-| GET | /api/leaves | Admin | All leave requests |
-| GET | /api/leaves/my | Employee | Own leave requests |
-| PUT | /api/leaves/:id/approve | Admin | Approve leave |
-| PUT | /api/leaves/:id/reject | Admin | Reject leave |
-
-### Transfers
-| Method | Route | Access | Description |
-|---|---|---|---|
-| POST | /api/transfers | Employee | Request transfer |
-| GET | /api/transfers | Admin | All transfer requests |
-| GET | /api/transfers/my | Employee | Own transfers |
-| PUT | /api/transfers/:id/approve | Admin | Approve transfer |
-| PUT | /api/transfers/:id/reject | Admin | Reject transfer |
-
-### Salary
-| Method | Route | Access | Description |
-|---|---|---|---|
-| GET | /api/salary/:emp_id | Admin/Self | Get salary history |
-| POST | /api/salary/generate | Admin | Generate monthly payslip |
-
-### Announcements
-| Method | Route | Access | Description |
-|---|---|---|---|
-| GET | /api/announcements | Any auth | Get all announcements |
-| POST | /api/announcements | Admin | Post announcement |
-| PUT | /api/announcements/:id | Admin | Edit announcement |
-| DELETE | /api/announcements/:id | Admin | Delete announcement |
+- **JWT-based stateless auth** — tokens are issued on login, stored in `localStorage`.
+- All protected routes use the `verifyToken` middleware.
+- Admin-only routes additionally require `isAdmin` middleware.
+- Passwords are hashed with **bcrypt** (salt rounds: 10).
+- CORS is strictly configured to only allow the Vercel deployment and localhost.
 
 ---
 
-## Security
+## Modules — Technical Detail
 
-- **Authentication:** JWT tokens stored in `localStorage`, sent as `Authorization: Bearer <token>` header
-- **Password Hashing:** All passwords are bcrypt-hashed with salt rounds = 10
-- **Role Enforcement:** `verifyToken` middleware checks JWT on all protected routes; `isAdmin` middleware additionally checks for admin role
-- **Document Access:** Employees can only access their own documents (enforced in controller)
-- **File Validation:** File type and size validated at both multer middleware level and controller level
-- **Input Sanitization:** Announcement content sanitized with DOMPurify before rendering
+### 1. Employee Management
+- Full CRUD for employee records.
+- Stores 15+ fields: name, DOB, Aadhaar, PAN, designation, department, grade pay, bank details, emergency contact.
+- Profile photo upload to Cloudinary (`image` resource type).
+
+### 2. Salary Module
+- Admin sets monthly pay structure (basic + allowances + deductions).
+- PDF payslip generation client-side using **jsPDF**.
+- Employees can view and download their own payslips.
+
+### 3. Leave Management
+- Employees apply for CL, EL, SL, etc.
+- Admin approves/rejects with remarks.
+- Status badges (Pending / Approved / Rejected) with real-time notification on decision.
+
+### 4. Transfer Module
+- Admin creates transfer records (from division, to division, date).
+- Employees can view their own transfer history.
+
+### 5. Documents
+- Employees upload personal documents (Aadhaar, PAN, certificates, payslips).
+- Files stored on Cloudinary using `image` resource type for universal delivery (PDFs included).
+- Secure download via Cloudinary signed URLs.
+
+### 6. Railway Pass
+- Admin issues concessional rail passes.
+- Tracks pass number, validity, class, dependent details.
+
+### 7. Meetings & Conferences *(Latest Module)*
+- Admin schedules meetings (title, date/time, type: Online/Offline, link/location, agenda).
+- Multi-participant selection with checkbox UI.
+- Document attachment (circulars, notes) uploaded to Cloudinary.
+- **Live countdown timer** on Employee portal for upcoming meetings.
+- Employees confirm attendance — updates `meeting_participants.status`.
+- Admin uploads **Minutes of Meeting (MoM)** — marks meeting as Completed.
+- Automated in-app notifications sent to all participants on meeting creation.
+
+### 8. Announcements
+- Admin broadcasts notices to all employees.
+- Employees see announcements on their dashboard.
+
+### 9. Notifications
+- In-app notification center (bell icon in header).
+- Notifications triggered for: new meetings, leave decisions, new documents.
 
 ---
 
-## File Upload Flow
+## Cloudinary Strategy
 
-```
-User selects file
-    ↓
-Frontend validation (type, size, title)
-    ↓
-FormData sent to POST /api/documents/upload
-    ↓
-Multer parses file → stored in memory buffer
-    ↓
-Controller validates (type, size, employee exists, access control)
-    ↓
-Cloudinary.uploader.upload_stream() → file uploaded
-    ↓
-Cloudinary returns { secure_url, public_id }
-    ↓
-Metadata saved to PostgreSQL documents table
-    ↓
-Response returned to frontend with document record
+All files (including PDFs) are uploaded using the `image` resource type. This avoids Cloudinary's strict `raw` delivery access controls which block direct file viewing on the free plan. This applies to:
+- Employee documents
+- Meeting attachments
+- Minutes of Meeting (MoM)
+
+---
+
+## Frontend Design System
+
+Global styles in `frontend/src/index.css`:
+
+| Token | Value |
+|---|---|
+| `--primary` | `#2f2f8f` (Indian Railways blue) |
+| `--primary-dark` | `#222272` |
+| `--primary-light` | `#4a4ab8` |
+| `--success` | `#22c55e` |
+| `--danger` | `#ef4444` |
+| `--warning` | `#f59e0b` |
+| Font | Inter (Google Fonts) |
+
+Key CSS classes: `.card`, `.btn`, `.btn-outline`, `.btn-danger`, `.input-group`, `.badge`, `.alert-*`
+
+---
+
+## Environment Variables
+
+### Backend (`backend/.env`)
+
+| Variable | Description |
+|---|---|
+| `PORT` | Server port (default: 5000, Render uses 10000) |
+| `DATABASE_URL` | Full PostgreSQL connection string |
+| `JWT_SECRET` | Secret key for JWT signing |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `CORS_ORIGIN` | *(Optional)* Extra comma-separated allowed origins |
+
+### Frontend (`frontend/.env`)
+
+| Variable | Description |
+|---|---|
+| `VITE_API_BASE_URL` | Backend API base URL |
+
+---
+
+## Migration Scripts
+
+Run these in order for a fresh database:
+
+```bash
+node db/migrate.js              # Core: employees, auth
+node db/migrate_v2.js           # Extended employee fields
+node db/comprehensive_migrate.js # Salary, leaves, transfers, docs, notifications
+node db/migrate_salary.js       # Salary extended columns
+node db/migrate_meetings.js     # Meetings, participants, meeting_documents
+node db/fix_schema.js           # Schema patches (safe to re-run)
 ```
 
 ---
 
-## PDF Generation
+## Known Limitations / Future Work
 
-Payslips are generated **entirely in the browser** using jsPDF:
-- No server involvement
-- Monthly payslip: portrait A4 with full salary breakdown
-- Annual payslip: landscape A4 with 12-month summary table + year-to-date totals
-- Railway branding in header (organization name, logo placeholder)
-
----
-
-## Known Limitations / Notes
-
-- The project uses `localStorage` for token storage (acceptable for internal tools; for public apps consider `httpOnly` cookies)
-- Firebase is initialized but its Storage is not used (replaced by Cloudinary)
-- The chunk size warning in Vite build is due to jsPDF/html2canvas bundling — not a functional issue
-- No email notification system is implemented (notifications are in-app only)
+- Email notifications (SMTP) are not yet integrated — currently in-app only.
+- No calendar export (iCal) for meetings yet.
+- No mobile-responsive layout (optimised for desktop).
+- Single-region PostgreSQL — no read replicas.

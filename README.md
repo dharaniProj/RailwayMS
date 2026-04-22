@@ -1,41 +1,79 @@
-# Railway Management System
+# 🚂 Railway Management System (RailwayMS)
 
-> A full-stack Employee Management System for Indian Railways — built with React, Node.js, PostgreSQL, and Cloudinary.
+> A full-stack Employee & Operations Management System for Indian Railways — built with **React**, **Node.js**, **PostgreSQL**, and **Cloudinary**. Deployed live on **Vercel** + **Render** + **Neon**.
+
+🌐 **Live App:** [railway-ms.vercel.app](https://railway-ms.vercel.app)  
+🔌 **API:** [railwayms.onrender.com](https://railwayms.onrender.com)
 
 ---
 
-## Tech Stack
+## ✨ Features
+
+### 👑 Admin Portal
+| Module | Capabilities |
+|---|---|
+| **Dashboard** | System overview — employees, leaves, transfers, recent activity |
+| **Employee Directory** | Full CRUD, profile photos, 15+ fields (Aadhaar, PAN, designation, etc.) |
+| **Register Employee** | Dedicated onboarding portal with auto-password generation |
+| **Salary** | Manage pay structure, generate PDF payslips, full salary history |
+| **Leaves** | Approve / reject leave requests, view leave calendar |
+| **Transfers** | Initiate and track employee transfers between divisions |
+| **Railway Pass** | Issue, manage, and renew railway concessional passes |
+| **Documents** | Upload and manage employee documents via Cloudinary |
+| **Meetings & Conferences** | Schedule meetings, invite participants, attach documents, upload MoM |
+| **Announcements** | Broadcast notices to all employees |
+| **Profile** | Admin profile management with photo upload |
+| **Notifications** | Real-time in-app notifications for all key actions |
+
+### 👤 Employee Portal
+| Module | Capabilities |
+|---|---|
+| **Dashboard** | Personalised overview of leaves, salary, recent notices |
+| **Profile** | View & update personal details, upload profile photo |
+| **Salary** | View salary slips, download PDF payslips |
+| **Leaves** | Apply for leave, track approval status |
+| **Transfers** | View own transfer history |
+| **Railway Pass** | Request and view railway pass status |
+| **Documents** | Access personal uploaded documents |
+| **Meetings & Conferences** | View scheduled meetings, confirm attendance, download attachments, view MoM |
+| **Announcements** | Read broadcast notices |
+| **Notifications** | In-app notifications for meetings, leave decisions, etc. |
+
+---
+
+## 🛠 Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, Vite, React Router v6 |
-| Backend | Node.js, Express.js |
-| Database | PostgreSQL |
-| File Storage | Cloudinary |
-| Auth | JWT (JSON Web Tokens) + bcrypt |
-| PDF Generation | jsPDF + jsPDF-AutoTable |
-| HTTP Client | Axios |
+| **Frontend** | React 18, Vite, React Router v6 |
+| **Backend** | Node.js 18+, Express.js |
+| **Database** | PostgreSQL (via Neon serverless in production) |
+| **File Storage** | Cloudinary (images + documents) |
+| **Authentication** | JWT (JSON Web Tokens) + bcrypt |
+| **PDF Generation** | jsPDF + jsPDF-AutoTable |
+| **HTTP Client** | Axios |
+| **Hosting (Frontend)** | Vercel |
+| **Hosting (Backend)** | Render |
+| **Hosting (Database)** | Neon |
 
 ---
 
-## Prerequisites
-
-Make sure you have these installed on your system:
+## 📦 Prerequisites
 
 - [Node.js](https://nodejs.org/) v18 or higher
-- [PostgreSQL](https://www.postgresql.org/) v14 or higher
+- [PostgreSQL](https://www.postgresql.org/) v14 or higher (for local development)
 - [Git](https://git-scm.com/)
 - A free [Cloudinary](https://cloudinary.com) account
 
 ---
 
-## Setup Instructions
+## ⚙️ Local Setup Instructions
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/railway-management.git
-cd railway-management
+git clone https://github.com/dharaniProj/RailwayMS.git
+cd RailwayMS
 ```
 
 ### 2. Setup the Backend
@@ -45,25 +83,19 @@ cd backend
 npm install
 ```
 
-#### Create the environment file
-
-Create a file named `.env` inside the `backend/` folder:
+Create a `.env` file inside `backend/`:
 
 ```env
 # Server
 PORT=5000
 
-# PostgreSQL
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=railway_management
-DB_PASSWORD=your_postgres_password
-DB_PORT=5432
+# PostgreSQL (local)
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/railway_management
 
 # JWT
 JWT_SECRET=your_super_secret_jwt_key_here
 
-# Cloudinary (get from cloudinary.com/console → API Keys)
+# Cloudinary (from cloudinary.com/console → API Keys)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
@@ -71,26 +103,27 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ### 3. Setup the Database
 
-Create the PostgreSQL database:
-
 ```bash
+# Create the database (one-time)
 psql -U postgres -c "CREATE DATABASE railway_management;"
-```
 
-Run the migration to create all tables:
-
-```bash
+# Run main schema migration
 cd backend
 node db/migrate.js
+
+# Run additional schema migrations
+node db/migrate_v2.js
+node db/comprehensive_migrate.js
+node db/migrate_meetings.js
 ```
 
-### 4. Seed Initial Data (Optional — test data)
+### 4. Seed Test Data (Optional)
 
 ```bash
 node db/seed.js
 ```
 
-> This creates the admin account and 5 test employees with salary history.
+> Creates the admin account + 5 test employees with salary history, leaves, and transfers.
 
 ### 5. Setup the Frontend
 
@@ -99,49 +132,109 @@ cd ../frontend
 npm install
 ```
 
-### 6. Start the Application
+Create a `.env` file inside `frontend/`:
+
+```env
+VITE_API_BASE_URL=http://localhost:5000
+```
+
+### 6. Run the Application
 
 **Terminal 1 — Backend:**
 ```bash
 cd backend
 node server.js
+# Runs at http://localhost:5000
 ```
-Backend runs at: `http://localhost:5000`
 
 **Terminal 2 — Frontend:**
 ```bash
 cd frontend
 npm run dev
+# Runs at http://localhost:5173
 ```
-Frontend runs at: `http://localhost:5173`
 
 ---
 
-## Project Structure
+## 🗂 Project Structure
 
 ```
-Railway/
+RailwayMS/
 ├── backend/
 │   ├── config/
-│   │   ├── db.js            # PostgreSQL connection
-│   │   ├── firebase.js      # Firebase (auth only)
-│   │   └── cloudinary.js    # Cloudinary config
-│   ├── controllers/         # Business logic
-│   ├── middleware/          # JWT auth middleware
-│   ├── routes/              # Express API routes
+│   │   ├── db.js              # PostgreSQL connection pool
+│   │   └── cloudinary.js      # Cloudinary SDK configuration
+│   ├── controllers/           # Business logic handlers
+│   │   ├── auth.js
+│   │   ├── employee.js
+│   │   ├── salary.js
+│   │   ├── leave.js
+│   │   ├── transfer.js
+│   │   ├── document.js
+│   │   ├── railwayPass.js
+│   │   ├── announcement.js
+│   │   ├── notification.js
+│   │   └── meeting.js
+│   ├── middleware/
+│   │   └── authMiddleware.js  # JWT verifyToken + isAdmin guards
+│   ├── routes/                # Express route definitions
+│   │   ├── auth.js
+│   │   ├── employee.js
+│   │   ├── salary.js
+│   │   ├── leave.js
+│   │   ├── transfer.js
+│   │   ├── document.js
+│   │   ├── railwayPass.js
+│   │   ├── announcement.js
+│   │   ├── notification.js
+│   │   └── meeting.js
 │   ├── db/
-│   │   └── migrate.js       # DB schema creation
-│   └── server.js            # Entry point
-└── frontend/
-    └── src/
-        ├── pages/           # React page components
-        ├── components/      # Shared components (Sidebar, etc.)
-        └── utils/           # PDF generator, helpers
+│   │   ├── migrate.js           # Core schema (employees, auth)
+│   │   ├── migrate_v2.js        # Extended employee fields
+│   │   ├── comprehensive_migrate.js  # Salary, leaves, transfers, docs
+│   │   ├── migrate_meetings.js  # Meetings module tables
+│   │   ├── migrate_salary.js    # Salary extended fields
+│   │   ├── fix_schema.js        # One-off schema patches
+│   │   ├── seed.js              # Full test data seed
+│   │   └── seed_samples.js      # Minimal seed (for fresh environments)
+│   └── server.js              # App entry point + route registration
+│
+├── frontend/
+│   └── src/
+│       ├── pages/
+│       │   ├── Login.jsx
+│       │   ├── AdminDashboard.jsx
+│       │   ├── AdminProfile.jsx
+│       │   ├── AdminSalary.jsx
+│       │   ├── AdminMeetings.jsx
+│       │   ├── RegisterEmployee.jsx
+│       │   ├── EmployeeDashboard.jsx
+│       │   ├── EmployeeProfile.jsx
+│       │   ├── EmployeeSalary.jsx
+│       │   ├── EmployeeMeetings.jsx
+│       │   ├── Leaves.jsx
+│       │   ├── Transfers.jsx
+│       │   ├── Documents.jsx
+│       │   ├── RailwayPass.jsx
+│       │   ├── Announcements.jsx
+│       │   └── ChangePassword.jsx
+│       ├── components/
+│       │   ├── Sidebar.jsx         # Shared navigation sidebar
+│       │   └── NotificationCenter.jsx
+│       ├── apiConfig.js            # Central API base URL config
+│       ├── App.jsx                 # Route definitions
+│       └── index.css              # Global design system
+│
+└── docs/
+    ├── DEPLOYMENT.md          # Step-by-step deployment guide
+    ├── MANUAL.md              # User manual for Admin & Employee
+    ├── PROJECT_DETAILS.md     # Full technical specification
+    └── TEST_ACCOUNTS.md       # Default login credentials
 ```
 
 ---
 
-## Default Login Credentials
+## 🔐 Default Login Credentials
 
 | Role | Employee ID | Password |
 |---|---|---|
@@ -156,23 +249,37 @@ Railway/
 
 ---
 
-## API Base URL
+## 🌐 API Endpoints Overview
 
-All API routes are prefixed with `/api`:
+All routes are prefixed with `/api`:
 
-```
-http://localhost:5000/api/auth
-http://localhost:5000/api/employees
-http://localhost:5000/api/documents
-http://localhost:5000/api/leaves
-http://localhost:5000/api/transfers
-http://localhost:5000/api/salary
-http://localhost:5000/api/announcements
-http://localhost:5000/api/notifications
-```
+| Endpoint | Description |
+|---|---|
+| `/api/auth` | Login, token validation |
+| `/api/employees` | Employee CRUD, profile photo upload |
+| `/api/salary` | Pay structure, payslip generation |
+| `/api/leaves` | Leave applications and approvals |
+| `/api/transfers` | Transfer records |
+| `/api/documents` | Document upload/download (Cloudinary) |
+| `/api/railwayPass` | Railway pass management |
+| `/api/announcements` | Broadcast notices |
+| `/api/notifications` | In-app notification feed |
+| `/api/meetings` | Meeting scheduling, participants, MoM |
 
 ---
 
-## Deployment
+## 🚀 Deployment
 
-See `docs/DEPLOYMENT.md` for step-by-step instructions to deploy this project for free using **Render** (backend) + **Vercel** (frontend) + **Neon** (PostgreSQL).
+This project is deployed **fully free** using:
+- **Frontend** → [Vercel](https://vercel.com) (auto-deploy on `git push`)
+- **Backend** → [Render](https://render.com) (Web Service, auto-deploy)
+- **Database** → [Neon](https://neon.tech) (serverless PostgreSQL)
+- **File Storage** → [Cloudinary](https://cloudinary.com) (free tier)
+
+See `docs/DEPLOYMENT.md` for complete step-by-step deployment instructions.
+
+---
+
+## 📄 License
+
+This project is built as an internal operations tool for educational/demonstration purposes.
