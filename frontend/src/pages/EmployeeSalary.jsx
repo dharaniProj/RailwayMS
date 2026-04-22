@@ -96,29 +96,21 @@ function EmployeeSalary() {
                       </tr>
                     </thead>
                     <tbody>
-                      {salaryHistory.map(record => {
-                        // Fallback logic for old records
-                        const basic = record.basic_pay || (record.net_salary / 0.94) * 0.5;
-                        const hra = record.hra || (record.net_salary / 0.94) * 0.2;
-                        const allowances = record.allowances || (record.net_salary / 0.94) * 0.3;
-                        const deductions = record.deductions || basic * 0.12;
-
-                        return (
-                          <tr key={record.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                            <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>{record.month_year}</td>
-                            <td style={{ padding: '0.8rem' }}>₹{parseFloat(basic).toFixed(2)}</td>
-                            <td style={{ padding: '0.8rem' }}>₹{parseFloat(hra).toFixed(2)}</td>
-                            <td style={{ padding: '0.8rem' }}>₹{parseFloat(allowances).toFixed(2)}</td>
-                            <td style={{ padding: '0.8rem', color: 'var(--danger)' }}>-₹{parseFloat(deductions).toFixed(2)}</td>
-                            <td style={{ padding: '0.8rem', color: 'var(--success)', fontWeight: 'bold' }}>₹{parseFloat(record.net_salary).toFixed(2)}</td>
-                            <td style={{ padding: '0.8rem' }}>
-                              <span style={{ backgroundColor: 'rgba(40,167,69,0.1)', color: 'var(--success)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
-                                {(record.status || 'paid').toUpperCase()}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {salaryHistory.map(record => (
+                        <tr key={record.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                          <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>{record.month_year}</td>
+                          <td style={{ padding: '0.8rem' }}>₹{parseFloat(record.basic_pay).toFixed(2)}</td>
+                          <td style={{ padding: '0.8rem' }}>₹{parseFloat(record.hra).toFixed(2)}</td>
+                          <td style={{ padding: '0.8rem' }}>₹{parseFloat(record.allowances).toFixed(2)}</td>
+                          <td style={{ padding: '0.8rem', color: 'var(--danger)' }}>-₹{parseFloat(record.deductions).toFixed(2)}</td>
+                          <td style={{ padding: '0.8rem', color: 'var(--success)', fontWeight: 'bold' }}>₹{parseFloat(record.net_salary).toFixed(2)}</td>
+                          <td style={{ padding: '0.8rem' }}>
+                            <span style={{ backgroundColor: 'rgba(40,167,69,0.1)', color: 'var(--success)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
+                              {record.status.toUpperCase()}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>

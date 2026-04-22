@@ -254,34 +254,26 @@ function AdminSalary() {
                     </tr>
                   </thead>
                   <tbody>
-                    {salaryHistory.map(record => {
-                      // Fallback logic for old records
-                      const basic = record.basic_pay || (record.net_salary / 0.94) * 0.5;
-                      const hra = record.hra || (record.net_salary / 0.94) * 0.2;
-                      const allowances = record.allowances || (record.net_salary / 0.94) * 0.3;
-                      const deductions = record.deductions || basic * 0.12;
-
-                      return (
-                        <tr key={record.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>{record.month_year}</td>
-                          <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem' }}>₹ {fmt(basic)}</td>
-                          <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem' }}>₹ {fmt(hra)}</td>
-                          <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem' }}>₹ {fmt(allowances)}</td>
-                          <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem', color: 'var(--danger)' }}>- ₹ {fmt(deductions)}</td>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: '700', color: 'var(--success)' }}>₹ {fmt(record.net_salary)}</td>
-                          <td style={{ padding: '0.75rem 1rem' }}>
-                            <span style={{ background: 'rgba(40,167,69,0.12)', color: '#155724', padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' }}>
-                              {(record.status || 'paid').toUpperCase()}
-                            </span>
-                          </td>
-                          <td style={{ padding: '0.75rem 1rem' }}>
-                            <button onClick={() => handleDownloadMonthly({ ...record, basic_pay: basic, hra: hra, allowances: allowances, deductions: deductions })} className="btn" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
-                              Download PDF
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {salaryHistory.map(record => (
+                      <tr key={record.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                        <td style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>{record.month_year}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem' }}>₹ {fmt(record.basic_pay)}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem' }}>₹ {fmt(record.hra)}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem' }}>₹ {fmt(record.allowances)}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.88rem', color: 'var(--danger)' }}>- ₹ {fmt(record.deductions)}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontWeight: '700', color: 'var(--success)' }}>₹ {fmt(record.net_salary)}</td>
+                        <td style={{ padding: '0.75rem 1rem' }}>
+                          <span style={{ background: 'rgba(40,167,69,0.12)', color: '#155724', padding: '3px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' }}>
+                            {(record.status || 'paid').toUpperCase()}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.75rem 1rem' }}>
+                          <button onClick={() => handleDownloadMonthly(record)} className="btn" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>
+                            Download PDF
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               )}
