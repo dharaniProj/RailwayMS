@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const meetingController = require('../controllers/meeting');
-const authMiddleware = require('../middleware/authMiddleware');
+const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 const multer = require('multer');
 
 // Configure multer for memory storage
@@ -11,12 +11,12 @@ const upload = multer({
 });
 
 // Admin Routes
-router.post('/', authMiddleware(['admin']), upload.fields([{ name: 'documents', maxCount: 5 }]), meetingController.createMeeting);
-router.get('/admin', authMiddleware(['admin']), meetingController.getAllMeetings);
-router.put('/:meeting_id/mom', authMiddleware(['admin']), upload.single('mom'), meetingController.uploadMoM);
+router.post('/', verifyToken, isAdmin, upload.fields([{ name: 'documents', maxCount: 5 }]), meetingController.createMeeting);
+router.get('/admin', verifyToken, isAdmin, meetingController.getAllMeetings);
+router.put('/:meeting_id/mom', verifyToken, isAdmin, upload.single('mom'), meetingController.uploadMoM);
 
-// Employee Routes
-router.get('/employee', authMiddleware(['employee', 'admin']), meetingController.getEmployeeMeetings);
-router.put('/:meeting_id/confirm', authMiddleware(['employee', 'admin']), meetingController.confirmAttendance);
+// Employee Routes (Both Admin and Employees can access these)
+router.get('/employee', verifyToken, meetingController.getEmployeeMeetings);
+router.put('/:meeting_id/confirm', verifyToken, meetingController.confirmAttendance);
 
 module.exports = router;
