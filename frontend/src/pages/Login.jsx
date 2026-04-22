@@ -22,8 +22,16 @@ function Login() {
       localStorage.setItem('role',  res.data.user.role);
       localStorage.setItem('user',  JSON.stringify(res.data.user));
       navigate(res.data.user.role === 'admin' ? '/admin' : '/employee');
-    } catch {
-      setError('Invalid credentials. Please check your Employee ID and password.');
+    } catch (err) {
+      if (!err.response) {
+        // Network error — backend unreachable or CORS
+        setError('Cannot reach the server. Check your internet or the backend may be starting up (try again in 30 seconds).');
+      } else if (err.response.status === 401) {
+        setError('Invalid Employee ID or password. Please try again.');
+      } else {
+        setError(`Server error (${err.response.status}): ${err.response.data?.message || 'Please try again.'}`);
+      }
+
     } finally {
       setLoading(false);
     }
