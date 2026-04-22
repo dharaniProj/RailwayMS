@@ -80,9 +80,9 @@ function NotificationCenter() {
         onClick={() => setShow(s => !s)}
         title="Notifications"
         style={{
-          background: show ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
-          border: '1px solid rgba(255,255,255,0.25)',
-          color: 'white',
+          background: show ? 'rgba(47,47,143,0.1)' : 'transparent',
+          border: '1px solid transparent',
+          color: 'var(--primary-blue)',
           cursor: 'pointer',
           width: '34px', height: '34px',
           borderRadius: '8px',
