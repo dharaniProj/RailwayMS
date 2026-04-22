@@ -167,69 +167,71 @@ function AdminMeetings() {
                     <div className="card" style={{ marginBottom: '2rem', padding: '2rem' }}>
                         <h3 style={{ marginTop: 0, borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Schedule Meeting</h3>
                         <form onSubmit={handleCreateMeeting} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                <div className="input-group" style={{ marginBottom: 0 }}>
                                     <label>Meeting Title *</label>
-                                    <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="form-input" placeholder="e.g. Monthly Review" />
+                                    <input type="text" required value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Monthly Review" />
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div>
+                                    <div className="input-group" style={{ marginBottom: 0 }}>
                                         <label>Date *</label>
-                                        <input type="date" required value={meetingDate} onChange={e => setMeetingDate(e.target.value)} className="form-input" min={new Date().toISOString().split('T')[0]} />
+                                        <input type="date" required value={meetingDate} onChange={e => setMeetingDate(e.target.value)} min={new Date().toISOString().split('T')[0]} />
                                     </div>
-                                    <div>
+                                    <div className="input-group" style={{ marginBottom: 0 }}>
                                         <label>Time *</label>
-                                        <input type="time" required value={meetingTime} onChange={e => setMeetingTime(e.target.value)} className="form-input" />
+                                        <input type="time" required value={meetingTime} onChange={e => setMeetingTime(e.target.value)} />
                                     </div>
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
+                                <div className="input-group" style={{ marginBottom: 0 }}>
                                     <label>Type *</label>
-                                    <select value={type} onChange={e => setType(e.target.value)} className="form-input">
+                                    <select value={type} onChange={e => setType(e.target.value)}>
                                         <option value="online">Online (Video Call)</option>
                                         <option value="offline">Offline (In Person)</option>
                                     </select>
                                 </div>
-                                <div>
+                                <div className="input-group" style={{ marginBottom: 0 }}>
                                     {type === 'online' ? (
-                                        <div>
+                                        <>
                                             <label>Meeting Link (Zoom, Meet, Webex) *</label>
-                                            <input type="url" required value={link} onChange={e => setLink(e.target.value)} className="form-input" placeholder="https://..." />
-                                        </div>
+                                            <input type="url" required value={link} onChange={e => setLink(e.target.value)} placeholder="https://..." />
+                                        </>
                                     ) : (
-                                        <div>
+                                        <>
                                             <label>Location/Room *</label>
-                                            <input type="text" required value={location} onChange={e => setLocation(e.target.value)} className="form-input" placeholder="e.g. Conference Room A" />
-                                        </div>
+                                            <input type="text" required value={location} onChange={e => setLocation(e.target.value)} placeholder="e.g. Conference Room A" />
+                                        </>
                                     )}
                                 </div>
                             </div>
 
-                            <div>
+                            <div className="input-group" style={{ marginTop: '0.5rem' }}>
                                 <label>Agenda / Description</label>
-                                <textarea value={agenda} onChange={e => setAgenda(e.target.value)} className="form-input" rows="3" placeholder="Brief points about the meeting..."></textarea>
+                                <textarea value={agenda} onChange={e => setAgenda(e.target.value)} rows="3" placeholder="Brief points about the meeting..."></textarea>
                             </div>
 
-                            <div style={{ border: '1px solid #ddd', padding: '1rem', borderRadius: '8px' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Invite Participants</label>
-                                <div style={{ maxHeight: '150px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem' }}>
+                            <div style={{ border: '1px solid var(--border)', padding: '1.2rem', borderRadius: 'var(--radius)', background: '#fafafa' }}>
+                                <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: '600', fontSize: '0.85rem', color: 'var(--text)' }}>Invite Participants</label>
+                                <div style={{ maxHeight: '180px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.8rem' }}>
                                     {employees.map(emp => (
-                                        <label key={emp.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: selectedParticipants.includes(emp.id) ? '#e3f2fd' : '#f9f9f9', borderRadius: '4px' }}>
-                                            <input type="checkbox" checked={selectedParticipants.includes(emp.id)} onChange={() => toggleParticipant(emp.id)} />
+                                        <label key={emp.id} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', padding: '0.6rem 0.8rem', background: selectedParticipants.includes(emp.id) ? '#e0e7ff' : '#ffffff', border: selectedParticipants.includes(emp.id) ? '1px solid #c7d2fe' : '1px solid #e2e8f0', borderRadius: '8px', transition: 'all 0.2s', fontSize: '0.88rem' }}>
+                                            <input type="checkbox" checked={selectedParticipants.includes(emp.id)} onChange={() => toggleParticipant(emp.id)} style={{ width: '16px', height: '16px', accentColor: 'var(--primary-blue)' }} />
                                             {emp.name} ({emp.employee_id})
                                         </label>
                                     ))}
                                 </div>
                             </div>
 
-                            <div>
+                            <div className="input-group" style={{ marginTop: '0.5rem' }}>
                                 <label>Attach Documents (Circulars, Notes - PDF/JPG/PNG only)</label>
-                                <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" onChange={e => setDocuments(e.target.files)} className="form-input" />
+                                <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" onChange={e => setDocuments(e.target.files)} style={{ padding: '0.5rem' }} />
                             </div>
 
-                            <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', padding: '0.8rem 2rem' }}>Send Invitations & Schedule</button>
+                            <button type="submit" className="btn" style={{ alignSelf: 'flex-start', padding: '0.8rem 2rem', fontSize: '0.95rem', borderRadius: '30px', boxShadow: '0 4px 12px rgba(47,47,143,0.2)' }}>
+                                ✨ Send Invitations & Schedule
+                            </button>
                         </form>
                     </div>
                 )}
