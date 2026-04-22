@@ -105,6 +105,18 @@ function Leaves() {
     }
   };
 
+  const handleDeleteLeave = async (id) => {
+    if (!window.confirm('Are you sure you want to permanently delete this leave record?')) return;
+    try {
+      await axios.delete(`${API}/leaves/${id}`, { headers });
+      alert('Leave record deleted.');
+      loadAllRequests();
+      if (selectedEmpId) handleSelectEmployee(selectedEmpId);
+    } catch (err) {
+      alert('Error deleting leave record.');
+    }
+  };
+
   const handleSelectEmployee = async (empId) => {
     setSelectedEmpId(empId);
     setEmpLeaveData(null);
@@ -364,7 +376,14 @@ function Leaves() {
                       <td style={{ padding: '10px', fontSize: '0.85rem' }}>
                         {new Date(r.start_date).toLocaleDateString('en-IN')} – {new Date(r.end_date).toLocaleDateString('en-IN')}
                       </td>
-                      <td style={{ padding: '10px' }}><StatusBadge status={r.status} /></td>
+                      <td style={{ padding: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <StatusBadge status={r.status} />
+                          <button onClick={() => handleDeleteLeave(r.id)} style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', fontSize: '1.1rem', padding: '2px' }} title="Delete Record">
+                            🗑
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                   {allRequests.filter(r => r.status !== 'pending').length === 0 && (

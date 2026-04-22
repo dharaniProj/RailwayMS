@@ -148,6 +148,17 @@ exports.addManualLeave = async (req, res) => {
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error adding manual leave:', error);
+        res.status(500).json({ message: 'Server error: ' + error.message });
+    }
+};
+
+exports.deleteLeave = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.query('DELETE FROM leaves WHERE id = $1', [id]);
+        res.json({ message: 'Leave request deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting leave:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };

@@ -8,7 +8,11 @@ function AdminDashboard() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [confirmDialog, setConfirmDialog] = useState(null); // { type: 'delete'|'reset', id, name }
+  const [confirmDialog, setConfirmDialog] = useState(null); 
+  const [editEmployee, setEditEmployee] = useState(null); // The employee being edited
+
+  const token = localStorage.getItem('token');
+  const headers = { Authorization: `Bearer ${token}` };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -19,10 +23,7 @@ function AdminDashboard() {
 
   const fetchEmployees = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_BASE_URL}/api/employees`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get(`${API_BASE_URL}/api/employees`, { headers });
       setEmployees(res.data);
     } catch (err) {
       console.error(err);
@@ -38,21 +39,15 @@ function AdminDashboard() {
   const confirmAction = async () => {
     if (!confirmDialog) return;
     const { type, id, name } = confirmDialog;
-    const token = localStorage.getItem('token');
     
     try {
       if (type === 'delete') {
-        await axios.delete(`${API_BASE_URL}/api/employees/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.delete(`${API_BASE_URL}/api/employees/${id}`, { headers });
         setConfirmDialog(null);
         fetchEmployees();
       } else if (type === 'reset') {
-        const res = await axios.post(`${API_BASE_URL}/api/employees/${id}/reset-password`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.post(`${API_BASE_URL}/api/employees/${id}/reset-password`, {}, { headers });
         setConfirmDialog(null);
-        // Show success alert for the new password
         window.alert(`Password reset successfully for ${name}!\n\nNew Password: ${res.data.new_password}`);
       }
     } catch (err) {
@@ -65,18 +60,30 @@ function AdminDashboard() {
     const file = e.target.files[0];
     if (!file) return;
     
-    const token = localStorage.getItem('token');
-    const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' };
     const formData = new FormData();
     formData.append('profile_photo', file);
 
     try {
-      await axios.post(`${API_BASE_URL}/api/employees/${empId}/profile-photo`, formData, { headers });
+      await axios.post(`${API_BASE_URL}/api/employees/${empId}/profile-photo`, formData, { 
+        headers: { ...headers, 'Content-Type': 'multipart/form-data' } 
+      });
       alert('Photo updated successfully!');
       fetchEmployees();
     } catch (err) {
       console.error(err);
       alert('Failed to update photo.');
+    }
+  };
+
+  const handleUpdateEmployee = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API_BASE_URL}/api/employees/${editEmployee.id}`, editEmployee, { headers });
+      alert('Employee details updated successfully!');
+      setEditEmployee(null);
+      fetchEmployees();
+    } catch (err) {
+      alert('Error updating employee details.');
     }
   };
 
@@ -98,6 +105,58 @@ function AdminDashboard() {
                 <button className="btn" onClick={() => setConfirmDialog(null)} style={{ flex: 1, backgroundColor: 'var(--text-muted)' }}>Cancel</button>
                 <button className="btn" onClick={confirmAction} style={{ flex: 1, backgroundColor: confirmDialog.type === 'delete' ? 'var(--danger)' : 'var(--primary-blue)' }}>Confirm</button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Employee Modal */}
+        {editEmployee && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+            <div className="card" style={{ maxWidth: '800px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h3 style={{ margin: 0 }}>Edit Employee: {editEmployee.name}</h3>
+                <button onClick={() => setEditEmployee(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#888' }}>&times;</button>
+              </div>
+              <form onSubmit={handleUpdateEmployee}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="input-group">
+                    <label>Full Name</label>
+                    <input type="text" value={editEmployee.name || ''} onChange={e => setEditEmployee({...editEmployee, name: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Email</label>
+                    <input type="email" value={editEmployee.email || ''} onChange={e => setEditEmployee({...editEmployee, email: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Department</label>
+                    <input type="text" value={editEmployee.department || ''} onChange={e => setEditEmployee({...editEmployee, department: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Designation</label>
+                    <input type="text" value={editEmployee.designation || ''} onChange={e => setEditEmployee({...editEmployee, designation: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Salary (Annual CTC)</label>
+                    <input type="number" value={editEmployee.salary || ''} onChange={e => setEditEmployee({...editEmployee, salary: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Leave Count</label>
+                    <input type="number" value={editEmployee.leave_count || 0} onChange={e => setEditEmployee({...editEmployee, leave_count: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Work Location</label>
+                    <input type="text" value={editEmployee.work_location || ''} onChange={e => setEditEmployee({...editEmployee, work_location: e.target.value})} />
+                  </div>
+                  <div className="input-group">
+                    <label>Phone Number</label>
+                    <input type="text" value={editEmployee.phone_number || ''} onChange={e => setEditEmployee({...editEmployee, phone_number: e.target.value})} />
+                  </div>
+                </div>
+                <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
+                  <button type="button" className="btn" onClick={() => setEditEmployee(null)} style={{ flex: 1, backgroundColor: 'var(--text-muted)' }}>Cancel</button>
+                  <button type="submit" className="btn" style={{ flex: 1 }}>Save Changes</button>
+                </div>
+              </form>
             </div>
           </div>
         )}
@@ -155,7 +214,11 @@ function AdminDashboard() {
                         </div>
                       </td>
                       <td style={{ padding: '0.8rem' }}>{emp.employee_id}</td>
-                      <td style={{ padding: '0.8rem' }}>{emp.name}</td>
+                      <td style={{ padding: '0.8rem' }}>
+                        <span onClick={() => setEditEmployee(emp)} style={{ color: 'var(--primary-blue)', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}>
+                          {emp.name}
+                        </span>
+                      </td>
                       <td style={{ padding: '0.8rem' }}>{emp.department || 'N/A'}</td>
                       <td style={{ padding: '0.8rem' }}>{emp.designation || 'N/A'}</td>
                       <td style={{ padding: '0.8rem' }}>
@@ -166,7 +229,7 @@ function AdminDashboard() {
                   ))}
                   {employees.length === 0 && (
                     <tr>
-                      <td colSpan="5" style={{ padding: '1rem', textAlign: 'center' }}>No employees found.</td>
+                      <td colSpan="6" style={{ padding: '1rem', textAlign: 'center' }}>No employees found.</td>
                     </tr>
                   )}
                 </tbody>

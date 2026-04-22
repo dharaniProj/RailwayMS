@@ -59,14 +59,10 @@ exports.uploadDocument = async (req, res) => {
         if (empCheck.rowCount === 0) return res.status(404).json({ message: 'Employee not found.' });
         const employee = empCheck.rows[0];
 
-        // Build structured folder path (mirrors old Firebase structure)
+        // Build structured folder path
         const timestamp = Date.now();
-        const safeFileName = req.file.originalname
-            .replace(/\s+/g, '_')
-            .replace(/[^a-zA-Z0-9._-]/g, '')
-            .replace(/\.[^/.]+$/, ''); // strip extension — Cloudinary handles it
-
-        const publicId   = `employee-docs/emp_${employee.employee_id}/${timestamp}_${safeFileName}`;
+        const originalName = req.file.originalname.replace(/\s+/g, '_');
+        const publicId = `employee-docs/emp_${employee.employee_id}/${timestamp}_${originalName}`;
         const resourceType = getResourceType(req.file.mimetype);
 
         // Upload to Cloudinary
