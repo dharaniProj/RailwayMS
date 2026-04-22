@@ -13,10 +13,9 @@ const ALLOWED_MIME_TYPES = [
 const ALLOWED_CATEGORIES = ['Salary', 'Leave', 'ID Proof', 'Transfer', 'Work', 'Other'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-// ─── Helper: determine Cloudinary resource_type ───────────────────────────────
-// Images → 'image', everything else (PDF, DOC, DOCX) → 'raw'
+// Images and PDFs → 'image' (Cloudinary requires PDFs to be 'image' to bypass strict raw delivery blocks), everything else (DOC, DOCX) → 'raw'
 const getResourceType = (mimetype) => {
-    if (['image/jpeg', 'image/png'].includes(mimetype)) return 'image';
+    if (['image/jpeg', 'image/png', 'application/pdf'].includes(mimetype)) return 'image';
     return 'raw';
 };
 

@@ -16,7 +16,7 @@ exports.registerEmployee = async (req, res) => {
         const uploadFileToCloud = (buffer, mimetype, folder) => {
             const cloudinary = require('../config/cloudinary');
             const { Readable } = require('stream');
-            const resourceType = ['image/jpeg', 'image/png'].includes(mimetype) ? 'image' : 'raw';
+            const resourceType = ['image/jpeg', 'image/png', 'application/pdf'].includes(mimetype) ? 'image' : 'raw';
             return new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                     { folder, resource_type: resourceType },
@@ -210,7 +210,7 @@ exports.updateProfilePhoto = async (req, res) => {
         const uploadFileToCloud = (buffer, mimetype, folder) => {
             const cloudinary = require('../config/cloudinary');
             const { Readable } = require('stream');
-            const resourceType = ['image/jpeg', 'image/png'].includes(mimetype) ? 'image' : 'raw';
+            const resourceType = ['image/jpeg', 'image/png', 'application/pdf'].includes(mimetype) ? 'image' : 'raw';
             return new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                     { folder, resource_type: resourceType },
