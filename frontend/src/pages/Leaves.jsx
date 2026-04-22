@@ -23,10 +23,15 @@ function Leaves() {
   const [allRequests, setAllRequests] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [selectedEmpId, setSelectedEmpId] = useState('');
-  const [empLeaveData, setEmpLeaveData] = useState(null); // { leaves, leave_count, name }
+  const [empLeaveData, setEmpLeaveData] = useState(null); 
   const [newLeaveCount, setNewLeaveCount] = useState(0);
 
-  // Admin Manual Leave entry
+  // Leave Detail Modal
+  const [selectedLeave, setSelectedLeave] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editSubject, setEditSubject] = useState('');
+  const [editReason, setEditReason] = useState('');
+
   const [manualSubject, setManualSubject] = useState('');
   const [manualReason, setManualReason] = useState('');
   const [manualStartDate, setManualStartDate] = useState('');
@@ -45,12 +50,12 @@ function Leaves() {
     }
   }, [role]);
 
-  /* ─── Employee functions ─── */
   const loadMyLeaves = async () => {
     try {
+      const user = JSON.parse(localStorage.getItem('user'));
       const [leavesRes, detailRes] = await Promise.all([
         axios.get(`${API}/leaves/me`, { headers }),
-        axios.get(`${API}/leaves/employee/${JSON.parse(localStorage.getItem('user')).id}`, { headers })
+        axios.get(`${API}/leaves/employee/${user.id}`, { headers })
       ]);
       setMyLeaves(Array.isArray(leavesRes.data) ? leavesRes.data : []);
       setMyLeaveCount(detailRes.data?.leave_count ?? 0);
@@ -62,37 +67,31 @@ function Leaves() {
   const handleApply = async (e) => {
     e.preventDefault();
     if (!startDate || !endDate) return alert('Please select start and end dates.');
-    if (new Date(endDate) < new Date(startDate)) return alert('End date cannot be before start date.');
     setApplying(true);
     try {
       await axios.post(`${API}/leaves/apply`, { subject, reason, start_date: startDate, end_date: endDate }, { headers });
-      alert('Leave application submitted successfully!');
+      alert('Leave application submitted!');
       setSubject(''); setReason(''); setStartDate(''); setEndDate('');
       loadMyLeaves();
     } catch (err) {
-      alert(err.response?.data?.message || 'Error submitting leave request.');
+      alert('Error submitting leave.');
     } finally {
       setApplying(false);
     }
   };
 
-  /* ─── Admin functions ─── */
   const loadAllRequests = async () => {
     try {
       const res = await axios.get(`${API}/leaves/requests`, { headers });
-      setAllRequests(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error('Error loading all leave requests:', err);
-    }
+      setAllRequests(res.data);
+    } catch (err) { console.error(err); }
   };
 
   const loadEmployees = async () => {
     try {
       const res = await axios.get(`${API}/employees`, { headers });
-      setEmployees(Array.isArray(res.data) ? res.data.filter(e => e.role !== 'admin') : []);
-    } catch (err) {
-      console.error('Error loading employees:', err);
-    }
+      setEmployees(res.data.filter(e => e.role !== 'admin'));
+    } catch (err) { console.error(err); }
   };
 
   const handleStatusUpdate = async (id, status) => {
@@ -100,72 +99,66 @@ function Leaves() {
     try {
       await axios.put(`${API}/leaves/${id}/status`, { status }, { headers });
       loadAllRequests();
-    } catch (err) {
-      alert('Error updating leave status.');
-    }
+    } catch (err) { alert('Error updating status.'); }
   };
 
   const handleDeleteLeave = async (id) => {
-    if (!window.confirm('Are you sure you want to permanently delete this leave record?')) return;
+    if (!window.confirm('Permanently delete this leave record?')) return;
     try {
       await axios.delete(`${API}/leaves/${id}`, { headers });
-      alert('Leave record deleted.');
+      alert('Deleted.');
+      setSelectedLeave(null);
       loadAllRequests();
       if (selectedEmpId) handleSelectEmployee(selectedEmpId);
-    } catch (err) {
-      alert('Error deleting leave record.');
-    }
+    } catch (err) { alert('Error deleting.'); }
+  };
+
+  const handleUpdateLeave = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API}/leaves/${selectedLeave.id}`, { subject: editSubject, reason: editReason }, { headers });
+      alert('Updated!');
+      setIsEditing(false);
+      setSelectedLeave({ ...selectedLeave, subject: editSubject, reason: editReason });
+      loadAllRequests();
+      if (selectedEmpId) handleSelectEmployee(selectedEmpId);
+    } catch (err) { alert('Error updating.'); }
   };
 
   const handleSelectEmployee = async (empId) => {
     setSelectedEmpId(empId);
-    setEmpLeaveData(null);
-    if (!empId) return;
+    if (!empId) { setEmpLeaveData(null); return; }
     try {
       const res = await axios.get(`${API}/leaves/employee/${empId}`, { headers });
       setEmpLeaveData(res.data);
       setNewLeaveCount(res.data?.leave_count ?? 0);
-    } catch (err) {
-      console.error('Error loading employee leave details:', err);
-    }
+    } catch (err) { console.error(err); }
   };
 
-  const handleUpdateCount = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(`${API}/leaves/employee/${selectedEmpId}/count`, { leave_count: newLeaveCount }, { headers });
-      alert('Leave count updated!');
-      setEmpLeaveData(prev => prev ? { ...prev, leave_count: newLeaveCount } : prev);
-    } catch (err) {
-      alert('Error updating leave count.');
-    }
+  const openLeaveModal = (leave) => {
+    setSelectedLeave(leave);
+    setEditSubject(leave.subject);
+    setEditReason(leave.reason);
+    setIsEditing(false);
   };
 
   const handleManualLeave = async (e) => {
     e.preventDefault();
-    if (!selectedEmpId) return alert('Please select an employee.');
-    if (!manualStartDate || !manualEndDate) return alert('Please select dates.');
     setRecording(true);
     try {
       await axios.post(`${API}/leaves/manual-add`, {
         employeeId: selectedEmpId,
-        subject: manualSubject,
-        reason: manualReason,
-        start_date: manualStartDate,
-        end_date: manualEndDate
+        subject: manualSubject, reason: manualReason,
+        start_date: manualStartDate, end_date: manualEndDate
       }, { headers });
-      alert('Leave recorded successfully!');
+      alert('Leave recorded!');
       setManualSubject(''); setManualReason(''); setManualStartDate(''); setManualEndDate('');
       handleSelectEmployee(selectedEmpId);
       loadAllRequests();
-    } catch (err) {
-      alert('Error recording leave.');
-    } finally {
-      setRecording(false);
-    }
+    } catch (err) { alert('Error recording.'); }
+    finally { setRecording(false); }
   };
 
-  /* ─── Status badge helper ─── */
   const StatusBadge = ({ status }) => {
     const colors = {
       pending: { bg: '#fff3cd', color: '#856404' },
@@ -173,224 +166,144 @@ function Leaves() {
       rejected: { bg: '#f8d7da', color: '#721c24' },
     };
     const c = colors[status] || colors.pending;
-    return (
-      <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', fontWeight: '600', backgroundColor: c.bg, color: c.color }}>
-        {status?.toUpperCase()}
-      </span>
-    );
+    return <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', fontWeight: '600', backgroundColor: c.bg, color: c.color }}>{status?.toUpperCase()}</span>;
   };
 
-  /* ─── RENDER ─── */
   return (
     <div className="app-container">
       <Sidebar role={role} />
       <div className="main-content">
         <h2>{role === 'admin' ? '🏖 Leave Management' : '🏖 My Leaves'}</h2>
 
-        {role === 'employee' ? (
-          /* ══════ EMPLOYEE VIEW ══════ */
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-            {/* Left column */}
-            <div>
-              <div className="card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
-                  <h3 style={{ margin: 0 }}>Apply for Leave</h3>
-                  <div style={{ background: 'var(--primary-blue)', color: 'white', borderRadius: '20px', padding: '4px 16px', fontSize: '0.88rem', fontWeight: '600' }}>
-                    Remaining: {myLeaveCount}
-                  </div>
-                </div>
-                <form onSubmit={handleApply}>
+        {selectedLeave && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100 }}>
+            <div className="card" style={{ maxWidth: '500px', width: '90%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                <h3 style={{ margin: 0 }}>Leave Details</h3>
+                <button onClick={() => setSelectedLeave(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#888' }}>&times;</button>
+              </div>
+              
+              {isEditing ? (
+                <form onSubmit={handleUpdateLeave}>
                   <div className="input-group">
                     <label>Subject</label>
-                    <input type="text" value={subject} onChange={e => setSubject(e.target.value)} required placeholder="e.g. Sick Leave, Personal" />
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <div className="input-group">
-                      <label>Start Date</label>
-                      <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required />
-                    </div>
-                    <div className="input-group">
-                      <label>End Date</label>
-                      <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required />
-                    </div>
+                    <input type="text" value={editSubject} onChange={e => setEditSubject(e.target.value)} required />
                   </div>
                   <div className="input-group">
                     <label>Reason</label>
-                    <textarea value={reason} onChange={e => setReason(e.target.value)} required rows="4" placeholder="Explain the reason for your leave..." style={{ resize: 'vertical' }} />
+                    <textarea value={editReason} onChange={e => setEditReason(e.target.value)} required rows="3" />
                   </div>
-                  <button type="submit" className="btn" disabled={applying} style={{ width: '100%', padding: '0.75rem' }}>
-                    {applying ? 'Submitting...' : 'Apply Leave'}
-                  </button>
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                    <button type="button" className="btn" onClick={() => setIsEditing(false)} style={{ flex: 1, backgroundColor: '#6c757d' }}>Cancel</button>
+                    <button type="submit" className="btn" style={{ flex: 1 }}>Save Changes</button>
+                  </div>
                 </form>
-              </div>
-
-              <div className="card">
-                <h3>Leave History</h3>
-                {myLeaves.length === 0
-                  ? <p style={{ color: '#888', textAlign: 'center', padding: '1rem' }}>No leave applications yet.</p>
-                  : myLeaves.map(l => (
-                    <div key={l.id} style={{ borderBottom: '1px solid #eee', padding: '10px 0' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <strong>{l.subject}</strong>
-                        <StatusBadge status={l.status} />
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: '#666', marginTop: '4px' }}>
-                        {new Date(l.start_date).toLocaleDateString('en-IN')} → {new Date(l.end_date).toLocaleDateString('en-IN')}
-                      </div>
+              ) : (
+                <div>
+                  <p><strong>Subject:</strong> {selectedLeave.subject}</p>
+                  <p><strong>Reason:</strong> {selectedLeave.reason}</p>
+                  <p><strong>Dates:</strong> {new Date(selectedLeave.start_date).toLocaleDateString()} – {new Date(selectedLeave.end_date).toLocaleDateString()}</p>
+                  <p><strong>Status:</strong> <StatusBadge status={selectedLeave.status} /></p>
+                  
+                  {role === 'admin' && (
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                      <button className="btn" onClick={() => setIsEditing(true)} style={{ flex: 1, backgroundColor: 'var(--primary-blue)' }}>Edit Details</button>
+                      <button className="btn" onClick={() => handleDeleteLeave(selectedLeave.id)} style={{ flex: 1, backgroundColor: '#dc3545' }}>Delete Record</button>
                     </div>
-                  ))
-                }
-              </div>
-            </div>
-
-            {/* Right column — Calendar */}
-            <div>
-              <div className="card">
-                <h3>Leave Tracker</h3>
-                <LeaveCalendar data={myLeaves} />
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
+        )}
+
+        {role === 'employee' ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+            <div>
+              <div className="card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                  <h3>Apply for Leave</h3>
+                  <div style={{ background: 'var(--primary-blue)', color: 'white', borderRadius: '20px', padding: '4px 16px', fontSize: '0.88rem', fontWeight: '600' }}>Remaining: {myLeaveCount}</div>
+                </div>
+                <form onSubmit={handleApply}>
+                  <div className="input-group"><label>Subject</label><input type="text" value={subject} onChange={e => setSubject(e.target.value)} required /></div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="input-group"><label>Start Date</label><input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required /></div>
+                    <div className="input-group"><label>End Date</label><input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required /></div>
+                  </div>
+                  <div className="input-group"><label>Reason</label><textarea value={reason} onChange={e => setReason(e.target.value)} required rows="4" /></div>
+                  <button type="submit" className="btn" disabled={applying} style={{ width: '100%' }}>{applying ? 'Submitting...' : 'Apply Leave'}</button>
+                </form>
+              </div>
+              <div className="card">
+                <h3>Leave History</h3>
+                {myLeaves.map(l => (
+                  <div key={l.id} onClick={() => openLeaveModal(l)} style={{ borderBottom: '1px solid #eee', padding: '10px 0', cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><strong>{l.subject}</strong><StatusBadge status={l.status} /></div>
+                    <div style={{ fontSize: '0.82rem', color: '#666' }}>{new Date(l.start_date).toLocaleDateString()} – {new Date(l.end_date).toLocaleDateString()}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="card"><h3>Leave Tracker</h3><LeaveCalendar data={myLeaves} onLeaveClick={openLeaveModal} /></div>
+          </div>
         ) : (
-          /* ══════ ADMIN VIEW ══════ */
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
-              {/* Pending requests */}
               <div className="card">
                 <h3>Pending Leave Requests</h3>
-                {allRequests.filter(r => r.status === 'pending').length === 0
-                  ? <p style={{ color: '#888', textAlign: 'center', padding: '1rem' }}>No pending requests.</p>
-                  : (
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '2px solid #eee', textAlign: 'left', backgroundColor: '#f8f9fa' }}>
-                          <th style={{ padding: '10px' }}>Employee</th>
-                          <th style={{ padding: '10px' }}>Subject</th>
-                          <th style={{ padding: '10px' }}>Duration</th>
-                          <th style={{ padding: '10px' }}>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allRequests.filter(r => r.status === 'pending').map(r => (
-                          <tr key={r.id} style={{ borderBottom: '1px solid #eee' }}>
-                            <td style={{ padding: '10px' }}>
-                              <div style={{ fontWeight: '600' }}>{r.employee_name}</div>
-                              <div style={{ fontSize: '0.78rem', color: '#888' }}>{r.employee_code}</div>
-                            </td>
-                            <td style={{ padding: '10px' }}>
-                              <div style={{ fontWeight: '600' }}>{r.subject}</div>
-                              <div style={{ fontSize: '0.78rem', color: '#666' }}>{r.reason}</div>
-                            </td>
-                            <td style={{ padding: '10px', fontSize: '0.85rem' }}>
-                              {new Date(r.start_date).toLocaleDateString('en-IN')} – {new Date(r.end_date).toLocaleDateString('en-IN')}
-                            </td>
-                            <td style={{ padding: '10px' }}>
-                              <button onClick={() => handleStatusUpdate(r.id, 'approved')} className="btn" style={{ padding: '5px 12px', fontSize: '0.8rem', backgroundColor: '#28a745', marginRight: '6px' }}>✓ Approve</button>
-                              <button onClick={() => handleStatusUpdate(r.id, 'rejected')} className="btn" style={{ padding: '5px 12px', fontSize: '0.8rem', backgroundColor: '#dc3545' }}>✗ Reject</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )
-                }
+                {allRequests.filter(r => r.status === 'pending').map(r => (
+                  <div key={r.id} style={{ borderBottom: '1px solid #eee', padding: '1rem 0', display: 'flex', justifyContent: 'space-between' }}>
+                    <div>
+                      <strong>{r.employee_name} ({r.employee_code})</strong>
+                      <div style={{ fontSize: '0.9rem' }}>{r.subject}: {r.reason}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#666' }}>{new Date(r.start_date).toLocaleDateString()} – {new Date(r.end_date).toLocaleDateString()}</div>
+                    </div>
+                    <div>
+                      <button onClick={() => handleStatusUpdate(r.id, 'approved')} className="btn" style={{ padding: '5px 10px', marginRight: '5px', backgroundColor: '#28a745' }}>Approve</button>
+                      <button onClick={() => handleStatusUpdate(r.id, 'rejected')} className="btn" style={{ padding: '5px 10px', backgroundColor: '#dc3545' }}>Reject</button>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              {/* Employee Calendar tracker */}
               <div className="card">
                 <h3>Employee Leave Tracker</h3>
                 <div className="input-group">
-                  <label>Select Employee</label>
                   <select value={selectedEmpId} onChange={e => handleSelectEmployee(e.target.value)}>
-                    <option value="">-- Select an employee --</option>
-                    {employees.map(e => (
-                      <option key={e.id} value={e.id}>{e.name} ({e.employee_id})</option>
-                    ))}
+                    <option value="">-- Select Employee --</option>
+                    {employees.map(e => <option key={e.id} value={e.id}>{e.name} ({e.employee_id})</option>)}
                   </select>
                 </div>
-
                 {empLeaveData && (
-                  <div style={{ animation: 'fadeIn 0.3s' }}>
-                    <form onSubmit={handleUpdateCount} style={{ backgroundColor: 'rgba(47,47,143,0.05)', padding: '0.8rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                      <label style={{ fontWeight: '600', fontSize: '0.85rem', display: 'block', marginBottom: '6px' }}>
-                        Leave Allowance for <span style={{ color: 'var(--primary-blue)' }}>{empLeaveData.name}</span>
-                      </label>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input type="number" min="0" value={newLeaveCount} onChange={e => setNewLeaveCount(e.target.value)} style={{ width: '80px', padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                        <button type="submit" className="btn" style={{ padding: '6px 14px' }}>Update</button>
-                      </div>
-                    </form>
-                    <LeaveCalendar data={empLeaveData.leaves} />
-
-                    <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px dashed #ccc' }}>
-                      <h4 style={{ marginBottom: '1rem', color: '#555' }}>Add Past / Manual Leave</h4>
+                  <div>
+                    <LeaveCalendar data={empLeaveData.leaves} onLeaveClick={openLeaveModal} />
+                    <div style={{ marginTop: '1.5rem', borderTop: '1px dashed #ccc', paddingTop: '1rem' }}>
+                      <h4>Add Manual Leave</h4>
                       <form onSubmit={handleManualLeave}>
-                        <div className="input-group">
-                          <label>Subject</label>
-                          <input type="text" value={manualSubject} onChange={e => setManualSubject(e.target.value)} required placeholder="e.g. Past Sick Leave" />
+                        <div className="input-group"><input type="text" value={manualSubject} onChange={e => setManualSubject(e.target.value)} required placeholder="Subject" /></div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                          <input type="date" value={manualStartDate} onChange={e => setManualStartDate(e.target.value)} required />
+                          <input type="date" value={manualEndDate} onChange={e => setManualEndDate(e.target.value)} required />
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-                          <div className="input-group">
-                            <label>Start Date</label>
-                            <input type="date" value={manualStartDate} onChange={e => setManualStartDate(e.target.value)} required />
-                          </div>
-                          <div className="input-group">
-                            <label>End Date</label>
-                            <input type="date" value={manualEndDate} onChange={e => setManualEndDate(e.target.value)} required />
-                          </div>
-                        </div>
-                        <div className="input-group">
-                          <label>Reason / Note</label>
-                          <input type="text" value={manualReason} onChange={e => setManualReason(e.target.value)} required placeholder="Reason for manual entry" />
-                        </div>
-                        <button type="submit" className="btn" disabled={recording} style={{ width: '100%', backgroundColor: '#6c757d' }}>
-                          {recording ? 'Recording...' : 'Record Manual Leave'}
-                        </button>
+                        <input type="text" value={manualReason} onChange={e => setManualReason(e.target.value)} required placeholder="Reason" style={{ marginTop: '0.5rem', width: '100%' }} />
+                        <button type="submit" className="btn" disabled={recording} style={{ width: '100%', marginTop: '0.5rem', backgroundColor: '#6c757d' }}>{recording ? 'Recording...' : 'Record Leave'}</button>
                       </form>
                     </div>
                   </div>
                 )}
               </div>
             </div>
-
-            {/* Processed history */}
             <div className="card" style={{ marginTop: '2rem' }}>
               <h3>All Leave History</h3>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #eee', backgroundColor: '#f8f9fa', textAlign: 'left' }}>
-                    <th style={{ padding: '10px' }}>Employee</th>
-                    <th style={{ padding: '10px' }}>Subject</th>
-                    <th style={{ padding: '10px' }}>Dates</th>
-                    <th style={{ padding: '10px' }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allRequests.filter(r => r.status !== 'pending').slice(0, 15).map(r => (
-                    <tr key={r.id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '10px' }}>
-                        <div style={{ fontWeight: '600' }}>{r.employee_name}</div>
-                        <div style={{ fontSize: '0.78rem', color: '#888' }}>{r.employee_code}</div>
-                      </td>
-                      <td style={{ padding: '10px' }}>{r.subject}</td>
-                      <td style={{ padding: '10px', fontSize: '0.85rem' }}>
-                        {new Date(r.start_date).toLocaleDateString('en-IN')} – {new Date(r.end_date).toLocaleDateString('en-IN')}
-                      </td>
-                      <td style={{ padding: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <StatusBadge status={r.status} />
-                          <button onClick={() => handleDeleteLeave(r.id)} style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', fontSize: '1.1rem', padding: '2px' }} title="Delete Record">
-                            🗑
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {allRequests.filter(r => r.status !== 'pending').length === 0 && (
-                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#888' }}>No history yet.</td></tr>
-                  )}
-                </tbody>
-              </table>
+              {allRequests.filter(r => r.status !== 'pending').slice(0, 15).map(r => (
+                <div key={r.id} onClick={() => openLeaveModal(r)} style={{ borderBottom: '1px solid #eee', padding: '10px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>
+                  <div><strong>{r.employee_name}</strong>: {r.subject} ({new Date(r.start_date).toLocaleDateString()} – {new Date(r.end_date).toLocaleDateString()})</div>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <StatusBadge status={r.status} />
+                    <button onClick={(e) => { e.stopPropagation(); handleDeleteLeave(r.id); }} style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer' }}>🗑</button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

@@ -162,3 +162,21 @@ exports.deleteLeave = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.updateLeave = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { subject, reason } = req.body;
+        
+        const result = await db.query(
+            'UPDATE leaves SET subject = $1, reason = $2 WHERE id = $3 RETURNING *',
+            [subject, reason, id]
+        );
+
+        if (result.rowCount === 0) return res.status(404).json({ message: 'Leave record not found' });
+        res.json({ message: 'Leave updated successfully', leave: result.rows[0] });
+    } catch (error) {
+        console.error('Error updating leave:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

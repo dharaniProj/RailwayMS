@@ -257,3 +257,26 @@ exports.updateEmployee = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.changePassword = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { current_password, new_password } = req.body;
+
+        const userRes = await db.query('SELECT password FROM employees WHERE id = $1', [userId]);
+        const user = userRes.rows[0];
+
+        const match = await bcrypt.compare(current_password, user.password);
+        if (!match) return res.status(401).json({ message: 'Current password is incorrect.' });
+
+        if (new_password.length < 6) return res.status(400).json({ message: 'New password must be at least 6 characters.' });
+
+        const hashedPassword = await bcrypt.hash(new_password, 10);
+        await db.query('UPDATE employees SET password = $1 WHERE id = $2', [hashedPassword, userId]);
+
+        res.json({ message: 'Password changed successfully.' });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

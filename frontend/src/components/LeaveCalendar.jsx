@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
-function LeaveCalendar({ data }) {
+function LeaveCalendar({ data, onLeaveClick }) {
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -54,21 +53,27 @@ function LeaveCalendar({ data }) {
           const leave = getLeaveForDay(day);
           const todayCell = isToday(day);
           return (
-            <div key={idx} title={leave ? `${leave.subject}` : ''} style={{
-              height: '38px',
-              border: todayCell ? '2px solid var(--primary-blue)' : '1px solid #eee',
-              borderRadius: '4px',
-              backgroundColor: leave ? 'var(--primary-blue)' : 'white',
-              color: leave ? 'white' : todayCell ? 'var(--primary-blue)' : 'black',
-              fontSize: '0.8rem',
-              fontWeight: todayCell ? 'bold' : 'normal',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: leave ? 'pointer' : 'default',
-              overflow: 'hidden'
-            }}>
+            <div 
+              key={idx} 
+              onClick={() => leave && onLeaveClick && onLeaveClick(leave)}
+              title={leave ? `${leave.subject}` : ''} 
+              style={{
+                height: '38px',
+                border: todayCell ? '2px solid var(--primary-blue)' : '1px solid #eee',
+                borderRadius: '4px',
+                backgroundColor: leave ? 'var(--primary-blue)' : 'white',
+                color: leave ? 'white' : todayCell ? 'var(--primary-blue)' : 'black',
+                fontSize: '0.8rem',
+                fontWeight: todayCell ? 'bold' : 'normal',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: leave ? 'pointer' : 'default',
+                transition: 'all 0.2s',
+                overflow: 'hidden'
+              }}
+            >
               {day}
               {leave && <div style={{ fontSize: '0.4rem', width: '90%', overflow: 'hidden', textAlign: 'center', whiteSpace: 'nowrap' }}>{leave.subject}</div>}
             </div>
@@ -77,7 +82,7 @@ function LeaveCalendar({ data }) {
       </div>
       <div style={{ marginTop: '8px', display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#888' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ width: '12px', height: '12px', backgroundColor: 'var(--primary-blue)', display: 'inline-block', borderRadius: '2px' }}></span> On Leave (Approved)
+          <span style={{ width: '12px', height: '12px', backgroundColor: 'var(--primary-blue)', display: 'inline-block', borderRadius: '2px' }}></span> Approved
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <span style={{ width: '12px', height: '12px', border: '2px solid var(--primary-blue)', display: 'inline-block', borderRadius: '2px' }}></span> Today

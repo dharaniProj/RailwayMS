@@ -7,13 +7,19 @@ function EmployeeProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Password Change state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changing, setChanging] = useState(false);
+
+  const token = localStorage.getItem('token');
+  const headers = { Authorization: `Bearer ${token}` };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get(`${API_BASE_URL}/api/employees/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(`${API_BASE_URL}/api/employees/me`, { headers });
         setProfile(res.data);
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -23,6 +29,26 @@ function EmployeeProfile() {
     };
     fetchProfile();
   }, []);
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) return alert('New passwords do not match.');
+    if (newPassword.length < 6) return alert('Password must be at least 6 characters.');
+    
+    setChanging(true);
+    try {
+      await axios.post(`${API_BASE_URL}/api/employees/change-password`, {
+        current_password: currentPassword,
+        new_password: newPassword
+      }, { headers });
+      alert('Password changed successfully!');
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error changing password.');
+    } finally {
+      setChanging(false);
+    }
+  };
 
   if (loading) return <div className="app-container"><Sidebar role="employee" /><div className="main-content"><h2>Loading Profile...</h2></div></div>;
 
@@ -70,11 +96,32 @@ function EmployeeProfile() {
               <p><strong>Official Assets:</strong> {profile?.official_assets || 'N/A'}</p>
             </section>
 
-            <section style={{ gridColumn: '1 / -1' }}>
+            <section>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Identification</h3>
               <p><strong>Aadhaar Number:</strong> {profile?.aadhaar_number || 'N/A'}</p>
               <p><strong>PAN Number:</strong> {profile?.pan_number || 'N/A'}</p>
               <p><strong>Health Card Number:</strong> {profile?.health_card_number || 'N/A'}</p>
+            </section>
+
+            <section>
+              <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Security</h3>
+              <form onSubmit={handleChangePassword}>
+                <div className="input-group">
+                  <label>Current Password</label>
+                  <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+                </div>
+                <div className="input-group">
+                  <label>New Password</label>
+                  <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
+                </div>
+                <div className="input-group">
+                  <label>Confirm New Password</label>
+                  <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+                </div>
+                <button type="submit" className="btn" disabled={changing} style={{ width: '100%', backgroundColor: '#6c757d' }}>
+                  {changing ? 'Updating...' : 'Change Password'}
+                </button>
+              </form>
             </section>
           </div>
         </div>
