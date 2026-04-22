@@ -17,7 +17,7 @@ const icons = {
 };
 
 const NavLink = ({ to, icon, label, badge }) => (
-  <li style={{ marginBottom: '0.2rem' }}>
+  <li style={{ margin: 0, padding: 0 }}>
     <RouterNavLink
       to={to}
       style={({ isActive }) => ({
@@ -93,12 +93,12 @@ function Sidebar({ role }) {
     }}>
       <div style={{ textAlign: 'center', paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <img src="/logo.png" alt="Railway Logo" style={{ width: '50px', marginBottom: '0.4rem' }} />
-        <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', letterSpacing: '1px', color: 'white' }}>RAILWAY MS</h2>
+        <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', letterSpacing: '1px', color: '#ffffff' }}>RAILWAY MS</h2>
         <p style={{ margin: '2px 0 0 0', fontSize: '0.65rem', color: '#a5a5d8', textTransform: 'uppercase', letterSpacing: '2px' }}>{role} Portal</p>
       </div>
 
       <nav style={{ flex: 1, overflowY: 'auto' }}>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        <ul style={{ display: 'flex', flexDirection: 'column', gap: '4px', listStyle: 'none', padding: 0, margin: 0 }}>
           <NavLink to={role === 'admin' ? '/admin' : '/employee'} icon="dashboard" label="Dashboard" />
           <NavLink to={`/${role}/profile`} icon="profile" label="Profile" />
           {role === 'admin' && <NavLink to="/admin/directory" icon="directory" label="Employee Directory" />}
