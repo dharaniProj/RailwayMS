@@ -3,7 +3,9 @@ import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import { generatePayslipPDF, generateAnnualPayslipPDF } from '../utils/pdfGenerator';
 
-const API = 'http://localhost:5000/api';
+import API_BASE_URL from '../apiConfig';
+
+const API = `${API_BASE_URL}/api`;
 const fmt = (n) => parseFloat(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function AdminSalary() {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../apiConfig';
 import NotificationCenter from './NotificationCenter';
 
 // Simple SVG icon component
@@ -31,7 +32,7 @@ function Sidebar({ role }) {
     const fetchUnread = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/announcements', {
+        const res = await axios.get(`${API_BASE_URL}/api/announcements`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const count = Array.isArray(res.data) ? res.data.filter(a => !a.is_read).length : 0;

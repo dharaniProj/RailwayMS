@@ -3,7 +3,9 @@ import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 import LeaveCalendar from '../components/LeaveCalendar';
 
-const API = 'http://localhost:5000/api';
+import API_BASE_URL from '../apiConfig';
+
+const API = `${API_BASE_URL}/api`;
 
 function Leaves() {
   const role = localStorage.getItem('role');

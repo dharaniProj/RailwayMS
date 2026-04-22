@@ -1,3 +1,4 @@
+import API_BASE_URL from '../apiConfig';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -25,7 +26,7 @@ function ChangePassword() {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/auth/change-password', { newPassword }, {
+      await axios.post('${API_BASE_URL}/api/auth/change-password', { newPassword }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

@@ -1,3 +1,4 @@
+import API_BASE_URL from '../apiConfig';
 import React, { useState } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
@@ -50,7 +51,7 @@ function RegisterEmployee() {
     // sending only the user data to the backend as requested by the user.
 
     try {
-      const res = await axios.post('http://localhost:5000/api/employees/register', data, {
+      const res = await axios.post('${API_BASE_URL}/api/employees/register', data, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

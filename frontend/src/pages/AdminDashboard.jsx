@@ -1,3 +1,4 @@
+import API_BASE_URL from '../apiConfig';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -19,7 +20,7 @@ function AdminDashboard() {
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/employees', {
+      const res = await axios.get('${API_BASE_URL}/api/employees', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEmployees(res.data);
@@ -41,13 +42,13 @@ function AdminDashboard() {
     
     try {
       if (type === 'delete') {
-        await axios.delete(`http://localhost:5000/api/employees/${id}`, {
+        await axios.delete(`${API_BASE_URL}/api/employees/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setConfirmDialog(null);
         fetchEmployees();
       } else if (type === 'reset') {
-        const res = await axios.post(`http://localhost:5000/api/employees/${id}/reset-password`, {}, {
+        const res = await axios.post(`${API_BASE_URL}/api/employees/${id}/reset-password`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setConfirmDialog(null);

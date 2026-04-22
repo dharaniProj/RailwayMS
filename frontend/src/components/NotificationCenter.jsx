@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../apiConfig';
 
 function NotificationCenter() {
   const [notifications, setNotifications] = useState([]);
@@ -27,7 +28,7 @@ function NotificationCenter() {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
-      const res = await axios.get('http://localhost:5000/api/notifications', {
+      const res = await axios.get(`${API_BASE_URL}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (Array.isArray(res.data)) setNotifications(res.data);
@@ -39,7 +40,7 @@ function NotificationCenter() {
   const markRead = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/notifications/${id}/read`, {}, {
+      await axios.put(`${API_BASE_URL}/api/notifications/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
@@ -49,7 +50,7 @@ function NotificationCenter() {
   const markAllRead = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put('http://localhost:5000/api/notifications/read-all', {}, {
+      await axios.put(`${API_BASE_URL}/api/notifications/read-all`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));

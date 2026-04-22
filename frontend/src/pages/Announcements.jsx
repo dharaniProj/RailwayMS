@@ -1,3 +1,4 @@
+import API_BASE_URL from '../apiConfig';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
@@ -22,7 +23,7 @@ function Announcements() {
   const fetchAnnouncements = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/announcements', {
+      const res = await axios.get('${API_BASE_URL}/api/announcements', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAnnouncements(res.data);
@@ -41,12 +42,12 @@ function Announcements() {
       const payload = { title, message, duration_hours: parseInt(duration) };
       
       if (editId) {
-        await axios.put(`http://localhost:5000/api/announcements/${editId}`, payload, {
+        await axios.put(`${API_BASE_URL}/api/announcements/${editId}`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('Announcement updated successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/announcements', payload, {
+        await axios.post('${API_BASE_URL}/api/announcements', payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('Announcement posted successfully!');
@@ -76,7 +77,7 @@ function Announcements() {
     if (!window.confirm('Are you sure you want to delete this announcement?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/announcements/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/announcements/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchAnnouncements();
@@ -89,7 +90,7 @@ function Announcements() {
     if (isRead || role === 'admin') return;
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/announcements/${id}/read`, {}, {
+      await axios.post(`${API_BASE_URL}/api/announcements/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Update local state to remove red dot

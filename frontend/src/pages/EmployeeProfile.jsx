@@ -1,3 +1,4 @@
+import API_BASE_URL from '../apiConfig';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
@@ -10,7 +11,7 @@ function EmployeeProfile() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/employees/me', {
+        const res = await axios.get('${API_BASE_URL}/api/employees/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProfile(res.data);

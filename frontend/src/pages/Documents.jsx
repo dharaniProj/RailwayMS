@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Sidebar from '../components/Sidebar';
 
-const API = 'http://localhost:5000/api';
+import API_BASE_URL from '../apiConfig';
+
+const API = `${API_BASE_URL}/api`;
 
 const CATEGORIES = ['All', 'Salary', 'Leave', 'ID Proof', 'Transfer', 'Work', 'Other'];
 const CATEGORY_COLORS = {
