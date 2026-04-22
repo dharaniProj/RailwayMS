@@ -15,12 +15,12 @@ function EmployeeSalary() {
       try {
         const token = localStorage.getItem('token');
         
-        const profileRes = await axios.get('${API_BASE_URL}/api/employees/me', {
+        const profileRes = await axios.get(`${API_BASE_URL}/api/employees/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProfile(profileRes.data);
 
-        const historyRes = await axios.get('${API_BASE_URL}/api/salary/me', {
+        const historyRes = await axios.get(`${API_BASE_URL}/api/salary/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSalaryHistory(historyRes.data);

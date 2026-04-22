@@ -51,7 +51,7 @@ function RegisterEmployee() {
     // sending only the user data to the backend as requested by the user.
 
     try {
-      const res = await axios.post('${API_BASE_URL}/api/employees/register', data, {
+      const res = await axios.post(`${API_BASE_URL}/api/employees/register`, data, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

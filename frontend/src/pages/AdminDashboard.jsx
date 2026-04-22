@@ -20,7 +20,7 @@ function AdminDashboard() {
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('${API_BASE_URL}/api/employees', {
+      const res = await axios.get(`${API_BASE_URL}/api/employees`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEmployees(res.data);

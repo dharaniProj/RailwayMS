@@ -11,7 +11,7 @@ function EmployeeProfile() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('${API_BASE_URL}/api/employees/me', {
+        const res = await axios.get(`${API_BASE_URL}/api/employees/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProfile(res.data);

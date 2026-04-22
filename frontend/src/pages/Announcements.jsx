@@ -23,7 +23,7 @@ function Announcements() {
   const fetchAnnouncements = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('${API_BASE_URL}/api/announcements', {
+      const res = await axios.get(`${API_BASE_URL}/api/announcements`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAnnouncements(res.data);
@@ -47,7 +47,7 @@ function Announcements() {
         });
         alert('Announcement updated successfully!');
       } else {
-        await axios.post('${API_BASE_URL}/api/announcements', payload, {
+        await axios.post(`${API_BASE_URL}/api/announcements`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert('Announcement posted successfully!');

@@ -35,7 +35,7 @@ function Transfers() {
   const fetchRequests = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('${API_BASE_URL}/api/transfers/requests', {
+      const res = await axios.get(`${API_BASE_URL}/api/transfers/requests`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAllRequests(res.data);
@@ -47,7 +47,7 @@ function Transfers() {
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('${API_BASE_URL}/api/employees', {
+      const res = await axios.get(`${API_BASE_URL}/api/employees`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEmployees(res.data);
@@ -59,7 +59,7 @@ function Transfers() {
   const fetchMyTransfers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('${API_BASE_URL}/api/transfers/me', {
+      const res = await axios.get(`${API_BASE_URL}/api/transfers/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTransfers(res.data);
@@ -71,7 +71,7 @@ function Transfers() {
   const fetchMyProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('${API_BASE_URL}/api/employees/me', {
+      const res = await axios.get(`${API_BASE_URL}/api/employees/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCurrentUser(res.data);
@@ -85,7 +85,7 @@ function Transfers() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post('${API_BASE_URL}/api/transfers/request', { 
+      await axios.post(`${API_BASE_URL}/api/transfers/request`, { 
         to_location: toLocation, 
         reason, 
         effective_date: effectiveDate 
@@ -120,7 +120,7 @@ function Transfers() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('${API_BASE_URL}/api/transfers/initiate', {
+      await axios.post(`${API_BASE_URL}/api/transfers/initiate`, {
         employeeId: manualEmpId,
         to_location: manualToLocation,
         effective_date: manualEffectiveDate,
