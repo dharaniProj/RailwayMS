@@ -95,14 +95,14 @@ function Sidebar({ role }) {
 
       <nav style={{ flex: 1 }}>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          <NavLink to={role === 'admin' ? '/admin' : '/employee'} icon="dashboard" label="Dashboard" />
+          <NavLink to={role === 'admin' ? '/admin-dashboard' : '/employee-dashboard'} icon="dashboard" label="Dashboard" />
           {role === 'admin' && <NavLink to="/admin/directory" icon="directory" label="Employee Directory" />}
-          <NavLink to={`/${role}/announcements`} icon="announcements" label="Announcements" badge={unreadAnn} />
-          <NavLink to={`/${role}/leaves`} icon="leaves" label="Leaves" />
-          <NavLink to={`/${role}/transfers`} icon="transfers" label="Transfers" />
-          <NavLink to={`/${role}/railway-pass`} icon="railwayPass" label="Railway Pass" />
-          <NavLink to={`/${role}/salary`} icon="salary" label="Salary" />
-          <NavLink to={`/${role}/documents`} icon="documents" label="Documents" />
+          <NavLink to="/announcements" icon="announcements" label="Announcements" badge={unreadAnn} />
+          <NavLink to="/leaves" icon="leaves" label="Leaves" />
+          <NavLink to="/transfers" icon="transfers" label="Transfers" />
+          <NavLink to="/railway-pass" icon="railwayPass" label="Railway Pass" />
+          <NavLink to="/salary" icon="salary" label="Salary" />
+          <NavLink to="/documents" icon="documents" label="Documents" />
         </ul>
       </nav>
 
