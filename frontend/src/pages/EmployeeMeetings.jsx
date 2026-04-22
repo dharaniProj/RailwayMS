@@ -67,16 +67,27 @@ function EmployeeMeetings() {
         <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f4f7f6' }}>
             <Sidebar role="employee" />
             <div style={{ flex: 1, padding: '2rem', marginLeft: '260px' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid #eee' }}>
+                {/* Premium Hero Section */}
+                <div style={{
+                    background: 'linear-gradient(135deg, var(--primary-blue) 0%, #4a4ab8 60%, #5c6bc0 100%)',
+                    borderRadius: '16px',
+                    padding: '2rem 2.5rem',
+                    color: 'white',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '2.5rem',
+                    boxShadow: '0 10px 30px rgba(47, 47, 143, 0.15)'
+                }}>
                     <div>
-                        <h2 style={{ margin: 0, color: '#333' }}>My Meetings & Conferences</h2>
-                        <p style={{ margin: '0.2rem 0 0 0', color: '#666' }}>View upcoming meetings and confirm your attendance.</p>
+                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', letterSpacing: '0.5px' }}>My Meetings & Conferences</h2>
+                        <p style={{ margin: '0.5rem 0 0 0', opacity: 0.9, fontSize: '0.95rem' }}>View your schedule, download agendas, and confirm your attendance.</p>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <NotificationCenter />
-                        <img src={user.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=random`} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                        <img src={user.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=random`} alt="" style={{ width: '45px', height: '45px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.3)' }} />
                     </div>
-                </header>
+                </div>
 
                 {error && <div style={{ padding: '1rem', background: '#ffebee', color: '#c62828', borderRadius: '8px', marginBottom: '1rem' }}>{error}</div>}
                 {success && <div style={{ padding: '1rem', background: '#e8f5e9', color: '#2e7d32', borderRadius: '8px', marginBottom: '1rem' }}>{success}</div>}
@@ -93,7 +104,17 @@ function EmployeeMeetings() {
                             const isUpcoming = meetingDateTime > currentTime && m.status !== 'Completed';
 
                             return (
-                                <div key={m.id} className="card" style={{ padding: '1.5rem', borderLeft: isUpcoming ? '5px solid #2f2f8f' : '5px solid #ccc' }}>
+                                <div key={m.id} className="card" style={{ 
+                                    padding: '2rem', 
+                                    borderLeft: isUpcoming ? '6px solid var(--primary-blue)' : '6px solid #ccc',
+                                    borderRadius: '12px',
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
+                                    transition: 'transform 0.2s',
+                                    cursor: 'default'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
+                                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                                >
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <div>
                                             <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--primary-blue)' }}>{m.title}</h3>
@@ -152,8 +173,8 @@ function EmployeeMeetings() {
                                         </div>
                                         
                                         {isUpcoming && m.my_status === 'Pending' && (
-                                            <button onClick={() => confirmAttendance(m.id)} className="btn-primary" style={{ padding: '0.6rem 1.5rem' }}>
-                                                ✓ Details Seen & Will Join on Time
+                                            <button onClick={() => confirmAttendance(m.id)} className="btn-primary" style={{ padding: '0.7rem 1.8rem', borderRadius: '30px', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(47,47,143,0.2)' }}>
+                                                ✓ Confirm Attendance
                                             </button>
                                         )}
                                     </div>

@@ -132,16 +132,27 @@ function AdminMeetings() {
         <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f4f7f6' }}>
             <Sidebar role="admin" />
             <div style={{ flex: 1, padding: '2rem', marginLeft: '260px' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid #eee' }}>
+                {/* Premium Hero Section */}
+                <div style={{
+                    background: 'linear-gradient(135deg, var(--primary-blue) 0%, #4a4ab8 60%, #5c6bc0 100%)',
+                    borderRadius: '16px',
+                    padding: '2rem 2.5rem',
+                    color: 'white',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '2.5rem',
+                    boxShadow: '0 10px 30px rgba(47, 47, 143, 0.15)'
+                }}>
                     <div>
-                        <h2 style={{ margin: 0, color: '#333' }}>Meetings & Conferences</h2>
-                        <p style={{ margin: '0.2rem 0 0 0', color: '#666' }}>Schedule meetings, invite employees, and manage records.</p>
+                        <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', letterSpacing: '0.5px' }}>Meetings & Conferences</h2>
+                        <p style={{ margin: '0.5rem 0 0 0', opacity: 0.9, fontSize: '0.95rem' }}>Schedule meetings, invite employees, and manage records.</p>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <NotificationCenter />
-                        <img src={user.profile_photo_url || `https://ui-avatars.com/api/?name=Admin&background=random`} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                        <img src={user.profile_photo_url || `https://ui-avatars.com/api/?name=Admin&background=random`} alt="" style={{ width: '45px', height: '45px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.3)' }} />
                     </div>
-                </header>
+                </div>
 
                 {error && <div style={{ padding: '1rem', background: '#ffebee', color: '#c62828', borderRadius: '8px', marginBottom: '1rem' }}>{error}</div>}
                 {success && <div style={{ padding: '1rem', background: '#e8f5e9', color: '#2e7d32', borderRadius: '8px', marginBottom: '1rem' }}>{success}</div>}
@@ -229,7 +240,16 @@ function AdminMeetings() {
                 {loading ? <p>Loading...</p> : meetings.length === 0 ? <p>No meetings found.</p> : (
                     <div style={{ display: 'grid', gap: '1.5rem', marginTop: '1rem' }}>
                         {meetings.map(m => (
-                            <div key={m.id} className="card" style={{ padding: '1.5rem' }}>
+                            <div key={m.id} className="card" style={{ 
+                                padding: '2rem', 
+                                borderRadius: '12px',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
+                                transition: 'transform 0.2s',
+                                cursor: 'default'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
+                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                            >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div>
                                         <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: 'var(--primary-blue)' }}>{m.title}</h4>

@@ -159,7 +159,7 @@ exports.confirmAttendance = async (req, res) => {
 
         const result = await db.query(`
             UPDATE meeting_participants
-            SET status = 'Confirmed', updated_at = CURRENT_TIMESTAMP
+            SET status = 'Confirmed'
             WHERE meeting_id = $1 AND employee_id = $2
             RETURNING *
         `, [meeting_id, employeeId]);
