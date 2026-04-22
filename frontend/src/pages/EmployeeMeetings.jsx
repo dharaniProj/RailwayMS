@@ -173,7 +173,7 @@ function EmployeeMeetings() {
                                         </div>
                                         
                                         {isUpcoming && m.my_status === 'Pending' && (
-                                            <button onClick={() => confirmAttendance(m.id)} className="btn-primary" style={{ padding: '0.7rem 1.8rem', borderRadius: '30px', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(47,47,143,0.2)' }}>
+                                            <button onClick={() => confirmAttendance(m.id)} className="btn" style={{ padding: '0.7rem 1.8rem', borderRadius: '30px', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(47,47,143,0.2)' }}>
                                                 ✓ Confirm Attendance
                                             </button>
                                         )}

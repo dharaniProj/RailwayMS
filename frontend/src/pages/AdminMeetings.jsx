@@ -158,8 +158,8 @@ function AdminMeetings() {
                 {success && <div style={{ padding: '1rem', background: '#e8f5e9', color: '#2e7d32', borderRadius: '8px', marginBottom: '1rem' }}>{success}</div>}
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
-                    <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-                        {showForm ? 'Cancel' : '+ Schedule New Meeting'}
+                    <button onClick={() => setShowForm(!showForm)} className={showForm ? "btn-outline" : "btn"} style={{ borderRadius: '30px', padding: '0.6rem 1.5rem', borderColor: showForm ? '#dc2626' : '', color: showForm ? '#dc2626' : '' }}>
+                        {showForm ? '✖ Cancel' : '➕ Schedule New Meeting'}
                     </button>
                 </div>
 
@@ -268,8 +268,8 @@ function AdminMeetings() {
                                     </div>
                                     
                                     {m.status !== 'Completed' && (
-                                        <button onClick={() => setMomMeetingId(momMeetingId === m.id ? null : m.id)} className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.4rem 1rem' }}>
-                                            Upload MoM
+                                        <button onClick={() => setMomMeetingId(momMeetingId === m.id ? null : m.id)} className={momMeetingId === m.id ? "btn-outline" : "btn"} style={{ fontSize: '0.85rem', padding: '0.4rem 1rem', borderRadius: '20px' }}>
+                                            {momMeetingId === m.id ? 'Cancel' : '📄 Upload MoM'}
                                         </button>
                                     )}
                                 </div>
@@ -304,8 +304,10 @@ function AdminMeetings() {
                                 {/* Upload MoM Form */}
                                 {momMeetingId === m.id && (
                                     <form onSubmit={handleUploadMoM} style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                        <input type="file" required accept=".pdf,.doc,.docx,.jpg,.png" onChange={e => setMomDocument(e.target.files[0])} className="form-input" style={{ flex: 1 }} />
-                                        <button type="submit" className="btn-primary" style={{ padding: '0.6rem 1.5rem' }}>Save MoM & Mark Completed</button>
+                                        <input type="file" required accept=".pdf,.doc,.docx,.jpg,.png" onChange={e => setMomDocument(e.target.files[0])} style={{ flex: 1, padding: '0.5rem', background: 'white', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                        <button type="submit" className="btn" style={{ padding: '0.6rem 1.5rem', background: '#22c55e', borderRadius: '30px', boxShadow: '0 4px 10px rgba(34,197,94,0.3)' }}>
+                                            ✅ Save MoM & Complete
+                                        </button>
                                     </form>
                                 )}
 
