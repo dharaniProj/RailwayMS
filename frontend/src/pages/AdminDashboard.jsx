@@ -117,6 +117,19 @@ function AdminDashboard() {
                 <h3 style={{ margin: 0 }}>Edit Employee: {editEmployee.name}</h3>
                 <button onClick={() => setEditEmployee(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#888' }}>&times;</button>
               </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                <img 
+                  src={editEmployee.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(editEmployee.name)}&size=80&background=random`} 
+                  alt="" 
+                  style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #ddd' }} 
+                />
+                <div>
+                  <h4 style={{ margin: 0 }}>{editEmployee.name}</h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>{editEmployee.employee_id} • {editEmployee.designation || 'No Designation'}</p>
+                </div>
+              </div>
+
               <form onSubmit={handleUpdateEmployee}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div className="input-group">

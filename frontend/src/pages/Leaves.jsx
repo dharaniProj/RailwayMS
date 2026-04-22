@@ -295,15 +295,23 @@ function Leaves() {
             </div>
             <div className="card" style={{ marginTop: '2rem' }}>
               <h3>All Leave History</h3>
-              {allRequests.filter(r => r.status !== 'pending').slice(0, 15).map(r => (
-                <div key={r.id} onClick={() => openLeaveModal(r)} style={{ borderBottom: '1px solid #eee', padding: '10px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}>
-                  <div><strong>{r.employee_name}</strong>: {r.subject} ({new Date(r.start_date).toLocaleDateString()} – {new Date(r.end_date).toLocaleDateString()})</div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <StatusBadge status={r.status} />
-                    <button onClick={(e) => { e.stopPropagation(); handleDeleteLeave(r.id); }} style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer' }}>🗑</button>
-                  </div>
-                </div>
-              ))}
+              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                {allRequests.filter(r => r.status !== 'pending').length === 0 
+                  ? <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No processed leaves found.</p>
+                  : allRequests.filter(r => r.status !== 'pending').map(r => (
+                    <div key={r.id} onClick={() => openLeaveModal(r)} style={{ borderBottom: '1px solid #eee', padding: '12px 0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', transition: 'background 0.2s' }} className="history-item">
+                      <div>
+                        <strong>{r.employee_name}</strong>: {r.subject} 
+                        <div style={{ fontSize: '0.8rem', color: '#666' }}>({new Date(r.start_date).toLocaleDateString()} – {new Date(r.end_date).toLocaleDateString()})</div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                        <StatusBadge status={r.status} />
+                        <button onClick={(e) => { e.stopPropagation(); handleDeleteLeave(r.id); }} style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', fontSize: '1.1rem' }} title="Delete Permanent Record">🗑</button>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
             </div>
           </div>
         )}

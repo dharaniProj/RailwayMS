@@ -170,11 +170,11 @@ exports.updateAdminProfile = async (req, res) => {
         const admin = adminRes.rows[0];
         const updates = [];
         const values = [];
-        if (name \u0026\u0026 name.trim()) {
+        if (name && name.trim()) {
             values.push(name.trim());
             updates.push(`name = $${values.length}`);
         }
-        if (newUsername \u0026\u0026 newUsername.trim() \u0026\u0026 newUsername.trim() !== admin.employee_id) {
+        if (newUsername && newUsername.trim() && newUsername.trim() !== admin.employee_id) {
             const exists = await db.query('SELECT id FROM employees WHERE employee_id = $1 AND id != $2', [newUsername.trim(), adminId]);
             if (exists.rowCount > 0) return res.status(409).json({ message: 'That username is already taken.' });
             values.push(newUsername.trim());
@@ -202,7 +202,7 @@ exports.updateProfilePhoto = async (req, res) => {
     try {
         const { id } = req.params;
         const requester = req.user;
-        if (requester.role !== 'admin' \u0026\u0026 requester.id !== parseInt(id)) {
+        if (requester.role !== 'admin' && requester.id !== parseInt(id)) {
             return res.status(403).json({ message: 'Permission denied.' });
         }
         if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
