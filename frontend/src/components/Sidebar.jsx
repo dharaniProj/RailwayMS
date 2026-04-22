@@ -12,6 +12,7 @@ const icons = {
   railwayPass: 'M2 9h20 M2 15h20 M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z',
   salary: 'M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
   documents: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8',
+  meetings: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
   profile: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9',
 };
@@ -107,6 +108,7 @@ function Sidebar({ role }) {
           <NavLink to={`/${role}/transfers`} icon="transfers" label="Transfers" />
           <NavLink to={`/${role}/railway-pass`} icon="railwayPass" label="Railway Pass" />
           <NavLink to={`/${role}/documents`} icon="documents" label="Documents" />
+          <NavLink to={`/${role}/meetings`} icon="meetings" label="Meetings" />
           <NavLink to={`/${role}/announcements`} icon="announcements" label="Announcements" badge={unreadAnn} />
         </ul>
       </nav>

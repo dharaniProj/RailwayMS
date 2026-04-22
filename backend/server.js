@@ -45,6 +45,7 @@ app.use('/api/leaves',        require('./routes/leave'));
 app.use('/api/transfers',     require('./routes/transfer'));
 app.use('/api/documents',     require('./routes/document'));
 app.use('/api/railwayPass',   require('./routes/railwayPass'));
+app.use('/api/meetings',      require('./routes/meeting'));
 
 app.get('/', (req, res) => {
   res.json({ status: 'ok', service: 'Railway Management System API' });
