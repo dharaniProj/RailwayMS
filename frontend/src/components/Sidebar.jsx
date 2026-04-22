@@ -12,11 +12,12 @@ const icons = {
   railwayPass: 'M2 9h20 M2 15h20 M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z',
   salary: 'M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
   documents: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8',
+  profile: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9',
 };
 
 const NavLink = ({ to, icon, label, badge }) => (
-  <li style={{ marginBottom: '0.5rem' }}>
+  <li style={{ marginBottom: '0.4rem' }}>
     <RouterNavLink
       to={to}
       style={({ isActive }) => ({
@@ -63,7 +64,7 @@ function Sidebar({ role }) {
       } catch (err) { console.error(err); }
     };
     fetchUnread();
-    const interval = setInterval(fetchUnread, 30000); // refresh every 30s
+    const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -80,20 +81,22 @@ function Sidebar({ role }) {
       height: '100vh',
       backgroundColor: '#2f2f8f',
       color: 'white',
-      padding: '2rem 1rem',
+      padding: '1.5rem 1rem',
       display: 'flex',
       flexDirection: 'column',
       position: 'fixed',
       left: 0,
       top: 0,
-      boxShadow: '4px 0 10px rgba(0,0,0,0.1)'
+      boxShadow: '4px 0 15px rgba(0,0,0,0.2)',
+      zIndex: 100
     }}>
-      <div style={{ padding: '0 1.2rem 2rem 1.2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '2rem' }}>
-        <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800', letterSpacing: '1px' }}>RAILWAY MS</h2>
-        <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: '#a5a5d8', textTransform: 'uppercase', letterSpacing: '2px' }}>{role} Portal</p>
+      <div style={{ textAlign: 'center', paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <img src="/logo.png" alt="Railway Logo" style={{ width: '60px', marginBottom: '0.8rem' }} />
+        <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', letterSpacing: '1px' }}>RAILWAY MS</h2>
+        <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: '#a5a5d8', textTransform: 'uppercase', letterSpacing: '2px' }}>{role} Portal</p>
       </div>
 
-      <nav style={{ flex: 1 }}>
+      <nav style={{ flex: 1, overflowY: 'auto' }}>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           <NavLink to={role === 'admin' ? '/admin' : '/employee'} icon="dashboard" label="Dashboard" />
           {role === 'admin' && <NavLink to="/admin/directory" icon="directory" label="Employee Directory" />}
@@ -103,10 +106,11 @@ function Sidebar({ role }) {
           <NavLink to={`/${role}/railway-pass`} icon="railwayPass" label="Railway Pass" />
           <NavLink to={`/${role}/salary`} icon="salary" label="Salary" />
           <NavLink to={`/${role}/documents`} icon="documents" label="Documents" />
+          <NavLink to={`/${role}/profile`} icon="profile" label="Profile" />
         </ul>
       </nav>
 
-      <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
+      <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
         <button
           onClick={handleLogout}
           style={{
