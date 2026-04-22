@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 import API_BASE_URL from '../apiConfig';
@@ -102,13 +103,13 @@ function EmployeeDashboard() {
             <h2 style={{ margin: 0 }}>Employee Dashboard</h2>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <div style={{ position: 'relative', cursor: 'pointer' }}>
+            <Link to="/employee/announcements" style={{ position: 'relative', cursor: 'pointer', color: 'inherit', display: 'flex', alignItems: 'center' }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f2f8f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
               <span style={{ position: 'absolute', top: -5, right: -5, background: '#ff4d4d', color: 'white', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2</span>
-            </div>
+            </Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
               <img src={profile?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || 'U')}&background=random`} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #eee' }} />
             </div>

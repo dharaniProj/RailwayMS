@@ -17,31 +17,32 @@ const icons = {
 };
 
 const NavLink = ({ to, icon, label, badge }) => (
-  <li style={{ marginBottom: '0.5rem' }}>
+  <li style={{ marginBottom: '0.2rem' }}>
     <RouterNavLink
       to={to}
       style={({ isActive }) => ({
         display: 'flex',
         alignItems: 'center',
-        padding: '0.8rem 1.2rem',
+        padding: '0.6rem 1.2rem',
         textDecoration: 'none',
         color: isActive ? 'white' : '#a5a5d8',
         backgroundColor: isActive ? '#3d3dbd' : 'transparent',
         borderRadius: '8px',
         transition: 'all 0.3s ease',
         fontWeight: isActive ? '600' : '500',
-        position: 'relative'
+        position: 'relative',
+        fontSize: '0.92rem'
       })}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '12px' }}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
         <path d={icons[icon]} />
       </svg>
       <span>{label}</span>
       {badge > 0 && (
         <span style={{
           position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
-          backgroundColor: '#ff4d4d', color: 'white', borderRadius: '50%', width: '18px', height: '18px',
-          fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold'
+          backgroundColor: '#ff4d4d', color: 'white', borderRadius: '50%', width: '16px', height: '16px',
+          fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold'
         }}>{badge}</span>
       )}
     </RouterNavLink>
@@ -64,7 +65,7 @@ function Sidebar({ role }) {
       } catch (err) { console.error(err); }
     };
     fetchUnread();
-    const interval = setInterval(fetchUnread, 30000); // refresh every 30s
+    const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -77,51 +78,52 @@ function Sidebar({ role }) {
 
   return (
     <div style={{
-      width: '260px',
+      width: '240px',
       height: '100vh',
       backgroundColor: '#2f2f8f',
       color: 'white',
-      padding: '2rem 1rem',
+      padding: '1rem 0.8rem',
       display: 'flex',
       flexDirection: 'column',
       position: 'fixed',
       left: 0,
       top: 0,
-      boxShadow: '4px 0 10px rgba(0,0,0,0.1)'
+      boxShadow: '4px 0 15px rgba(0,0,0,0.2)',
+      zIndex: 100
     }}>
-      <div style={{ textAlign: 'center', paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <img src="/logo.png" alt="Railway Logo" style={{ width: '60px', marginBottom: '0.8rem' }} />
-        <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', letterSpacing: '1px' }}>RAILWAY MS</h2>
-        <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: '#a5a5d8', textTransform: 'uppercase', letterSpacing: '2px' }}>{role} Portal</p>
+      <div style={{ textAlign: 'center', paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <img src="/logo.png" alt="Railway Logo" style={{ width: '50px', marginBottom: '0.4rem' }} />
+        <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', letterSpacing: '1px', color: 'white' }}>RAILWAY MS</h2>
+        <p style={{ margin: '2px 0 0 0', fontSize: '0.65rem', color: '#a5a5d8', textTransform: 'uppercase', letterSpacing: '2px' }}>{role} Portal</p>
       </div>
 
-      <nav style={{ flex: 1 }}>
+      <nav style={{ flex: 1, overflowY: 'auto' }}>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           <NavLink to={role === 'admin' ? '/admin' : '/employee'} icon="dashboard" label="Dashboard" />
+          <NavLink to={`/${role}/profile`} icon="profile" label="Profile" />
           {role === 'admin' && <NavLink to="/admin/directory" icon="directory" label="Employee Directory" />}
-          <NavLink to={`/${role}/announcements`} icon="announcements" label="Announcements" badge={unreadAnn} />
+          <NavLink to={`/${role}/salary`} icon="salary" label="Salary" />
           <NavLink to={`/${role}/leaves`} icon="leaves" label="Leaves" />
           <NavLink to={`/${role}/transfers`} icon="transfers" label="Transfers" />
           <NavLink to={`/${role}/railway-pass`} icon="railwayPass" label="Railway Pass" />
-          <NavLink to={`/${role}/salary`} icon="salary" label="Salary" />
           <NavLink to={`/${role}/documents`} icon="documents" label="Documents" />
-          <NavLink to={`/${role}/profile`} icon="profile" label="Profile" />
+          <NavLink to={`/${role}/announcements`} icon="announcements" label="Announcements" badge={unreadAnn} />
         </ul>
       </nav>
 
-      <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
+      <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.8rem' }}>
         <button
           onClick={handleLogout}
           style={{
             display: 'flex',
             alignItems: 'center',
             width: '100%',
-            padding: '0.8rem 1.2rem',
+            padding: '0.6rem 1.2rem',
             backgroundColor: 'transparent',
             border: 'none',
             color: '#ff8a8a',
             cursor: 'pointer',
-            fontSize: '1rem',
+            fontSize: '0.95rem',
             fontWeight: '600',
             borderRadius: '8px',
             transition: 'background 0.3s'
@@ -129,7 +131,7 @@ function Sidebar({ role }) {
           onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,138,138,0.1)'}
           onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '12px' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}>
             <path d={icons.logout} />
           </svg>
           Logout
