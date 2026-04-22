@@ -60,14 +60,14 @@ const setupDatabase = async () => {
     // ── leaves ────────────────────────────────────────────────────────────────
     await pool.query(`
       CREATE TABLE IF NOT EXISTS leaves (
-        id          SERIAL PRIMARY KEY,
-        emp_id      INTEGER REFERENCES employees(id) ON DELETE CASCADE,
-        subject     VARCHAR(255),
-        reason      TEXT NOT NULL,
-        start_date  DATE,
-        end_date    DATE,
-        status      VARCHAR(20) DEFAULT 'pending',
-        applied_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        id           SERIAL PRIMARY KEY,
+        employee_id  INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        subject      VARCHAR(255),
+        reason       TEXT NOT NULL,
+        start_date   DATE,
+        end_date     DATE,
+        status       VARCHAR(20) DEFAULT 'pending',
+        created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log('  leaves table OK');
@@ -76,12 +76,13 @@ const setupDatabase = async () => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS transfers (
         id                  SERIAL PRIMARY KEY,
-        emp_id              INTEGER REFERENCES employees(id) ON DELETE CASCADE,
-        current_location    VARCHAR(100),
-        requested_location  VARCHAR(100),
+        employee_id         INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        from_location       VARCHAR(100),
+        to_location         VARCHAR(100),
         reason              TEXT,
         status              VARCHAR(20) DEFAULT 'pending',
-        applied_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        effective_date      DATE,
+        created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log('  transfers table OK');
@@ -90,7 +91,7 @@ const setupDatabase = async () => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS documents (
         doc_id            SERIAL PRIMARY KEY,
-        emp_id            INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        employee_id       INTEGER REFERENCES employees(id) ON DELETE CASCADE,
         title             VARCHAR(255) NOT NULL,
         category          VARCHAR(100) DEFAULT 'Other',
         file_url          TEXT NOT NULL,
@@ -108,14 +109,14 @@ const setupDatabase = async () => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS salary_history (
         id           SERIAL PRIMARY KEY,
-        emp_id       INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        employee_id  INTEGER REFERENCES employees(id) ON DELETE CASCADE,
         month        INTEGER NOT NULL,
         year         INTEGER NOT NULL,
         gross_salary NUMERIC(12,2),
         deductions   NUMERIC(12,2),
         net_salary   NUMERIC(12,2),
         generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(emp_id, month, year)
+        UNIQUE(employee_id, month, year)
       )
     `);
     console.log('  salary_history table OK');
@@ -148,7 +149,8 @@ const setupDatabase = async () => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS notifications (
         id         SERIAL PRIMARY KEY,
-        emp_id     INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        user_id    INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        title      VARCHAR(255),
         message    TEXT NOT NULL,
         type       VARCHAR(50) DEFAULT 'general',
         is_read    BOOLEAN DEFAULT FALSE,

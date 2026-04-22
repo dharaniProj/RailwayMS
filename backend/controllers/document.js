@@ -94,7 +94,7 @@ exports.uploadDocument = async (req, res) => {
 
         // Save metadata to PostgreSQL
         const result = await db.query(
-            `INSERT INTO documents (emp_id, title, category, file_url, file_name, file_type, file_size, uploaded_by, storage_public_id)
+            `INSERT INTO documents (employee_id, title, category, file_url, file_name, file_type, file_size, uploaded_by, storage_public_id)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
             [
                 emp_id,
@@ -114,8 +114,8 @@ exports.uploadDocument = async (req, res) => {
             document: result.rows[0],
         });
     } catch (error) {
-        console.error('Error uploading document:', error);
-        res.status(500).json({ message: 'Upload failed: ' + error.message });
+        console.error('[DocumentController] Upload failed. Error details:', error);
+        res.status(500).json({ message: `Upload failed: ${error.message}. (Backend check: Ensure file was saved and server was restarted)` });
     }
 };
 
@@ -135,8 +135,8 @@ exports.getDocumentsByEmployee = async (req, res) => {
         let queryText = `
             SELECT d.*, e.name AS employee_name, e.employee_id AS employee_code
             FROM documents d
-            JOIN employees e ON d.emp_id = e.id
-            WHERE d.emp_id = $1
+            JOIN employees e ON d.employee_id = e.id
+            WHERE d.employee_id = $1
         `;
         const params = [emp_id];
 
@@ -163,14 +163,14 @@ exports.getAllDocuments = async (req, res) => {
         let queryText = `
             SELECT d.*, e.name AS employee_name, e.employee_id AS employee_code
             FROM documents d
-            JOIN employees e ON d.emp_id = e.id
+            JOIN employees e ON d.employee_id = e.id
             WHERE 1=1
         `;
         const params = [];
 
         if (emp_id) {
             params.push(emp_id);
-            queryText += ` AND d.emp_id = $${params.length}`;
+            queryText += ` AND d.employee_id = $${params.length}`;
         }
         if (category && ALLOWED_CATEGORIES.includes(category)) {
             params.push(category);

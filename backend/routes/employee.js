@@ -19,5 +19,6 @@ router.put('/admin/profile', verifyToken, isAdmin, employeeController.updateAdmi
 router.put('/:id/salary', verifyToken, isAdmin, employeeController.updateSalary);
 router.delete('/:id', verifyToken, isAdmin, employeeController.deleteEmployee);
 router.post('/:id/reset-password', verifyToken, isAdmin, employeeController.resetPassword);
+router.post('/:id/profile-photo', verifyToken, upload.single('profile_photo'), employeeController.updateProfilePhoto);
 
 module.exports = router;

@@ -13,6 +13,8 @@ function EmployeeDashboard() {
   const [transfers, setTransfers] = useState([]);
   const [leaveCount, setLeaveCount] = useState(null);
   const [showMarquee, setShowMarquee] = useState(true);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const fileInputRef = React.useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => setShowMarquee(false), 60000);
@@ -47,6 +49,28 @@ function EmployeeDashboard() {
     };
     load();
   }, []);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setPhotoUploading(true);
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' };
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+
+    try {
+      const res = await axios.post(`${API}/employees/${profile.id}/profile-photo`, formData, { headers });
+      setProfile({ ...profile, profile_photo_url: res.data.url });
+      alert('Profile photo updated!');
+    } catch (err) {
+      console.error('Photo upload error:', err);
+      alert('Failed to upload photo.');
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
 
   const getGreeting = () => {
     const h = new Date().getHours();
@@ -100,11 +124,17 @@ function EmployeeDashboard() {
           <div style={{ position: 'absolute', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', bottom: '-30px', right: '120px', pointerEvents: 'none' }} />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.8rem', position: 'relative' }}>
-            <img
-              src={profile?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || 'U')}&background=ffffff&color=2f2f8f&size=100&bold=true`}
-              alt="Profile"
-              style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.4)', flexShrink: 0 }}
-            />
+            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => fileInputRef.current.click()}>
+              <img
+                src={profile?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || 'U')}&background=ffffff&color=2f2f8f&size=100&bold=true`}
+                alt="Profile"
+                style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.4)', flexShrink: 0, opacity: photoUploading ? 0.5 : 1 }}
+              />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, background: 'white', borderRadius: '50%', padding: '4px', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handlePhotoUpload} />
+            </div>
             <div>
               <div style={{ fontSize: '0.88rem', opacity: 0.7, letterSpacing: '0.5px', marginBottom: '4px', textTransform: 'uppercase' }}>
                 {getGreeting()}

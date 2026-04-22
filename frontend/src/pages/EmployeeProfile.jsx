@@ -34,35 +34,47 @@ function EmployeeProfile() {
         <div className="card">
           <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>These details were entered by the Administrator during your registration. They are read-only.</p>
           
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '2rem' }}>
+            <img 
+              src={profile?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || 'User')}&size=120&background=2f2f8f&color=fff`} 
+              alt="Profile" 
+              style={{ width: '120px', height: '120px', borderRadius: '12px', objectFit: 'cover', border: '4px solid #eee' }} 
+            />
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--primary-blue)' }}>{profile?.name}</h3>
+              <p style={{ margin: '5px 0 0 0', fontWeight: '600', color: '#666' }}>{profile?.designation} — {profile?.employee_id}</p>
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
             <section>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Basic Information</h3>
-              <p><strong>Employee ID:</strong> {profile.employee_id}</p>
-              <p><strong>Full Name:</strong> {profile.name}</p>
-              <p><strong>Email:</strong> {profile.email}</p>
-              <p><strong>Phone:</strong> {profile.phone_number || 'N/A'}</p>
-              <p><strong>DOB:</strong> {profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : 'N/A'}</p>
-              <p><strong>Gender:</strong> {profile.gender || 'N/A'}</p>
-              <p><strong>Marital Status:</strong> {profile.marital_status || 'N/A'}</p>
-              {profile.marital_status === 'Married' && <p><strong>Spouse Name:</strong> {profile.spouse_name || 'N/A'}</p>}
+              <p><strong>Employee ID:</strong> {profile?.employee_id}</p>
+              <p><strong>Full Name:</strong> {profile?.name}</p>
+              <p><strong>Email:</strong> {profile?.email}</p>
+              <p><strong>Phone:</strong> {profile?.phone_number || 'N/A'}</p>
+              <p><strong>DOB:</strong> {profile?.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : 'N/A'}</p>
+              <p><strong>Gender:</strong> {profile?.gender || 'N/A'}</p>
+              <p><strong>Marital Status:</strong> {profile?.marital_status || 'N/A'}</p>
+              {profile?.marital_status === 'Married' && <p><strong>Spouse Name:</strong> {profile?.spouse_name || 'N/A'}</p>}
             </section>
 
             <section>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Job Information</h3>
-              <p><strong>Department:</strong> {profile.department || 'N/A'}</p>
-              <p><strong>Designation:</strong> {profile.designation || 'N/A'}</p>
-              <p><strong>Joining Date:</strong> {profile.joining_date ? new Date(profile.joining_date).toLocaleDateString() : 'N/A'}</p>
-              <p><strong>Employment Type:</strong> {profile.employment_type || 'N/A'}</p>
-              <p><strong>Work Location:</strong> {profile.work_location || 'N/A'}</p>
-              <p><strong>Salary:</strong> {profile.salary ? `₹${profile.salary}` : 'N/A'}</p>
-              <p><strong>Official Assets:</strong> {profile.official_assets || 'N/A'}</p>
+              <p><strong>Department:</strong> {profile?.department || 'N/A'}</p>
+              <p><strong>Designation:</strong> {profile?.designation || 'N/A'}</p>
+              <p><strong>Joining Date:</strong> {profile?.joining_date ? new Date(profile.joining_date).toLocaleDateString() : 'N/A'}</p>
+              <p><strong>Employment Type:</strong> {profile?.employment_type || 'N/A'}</p>
+              <p><strong>Work Location:</strong> {profile?.work_location || 'N/A'}</p>
+              <p><strong>Salary:</strong> {profile?.salary ? `₹${profile.salary}` : 'N/A'}</p>
+              <p><strong>Official Assets:</strong> {profile?.official_assets || 'N/A'}</p>
             </section>
 
             <section style={{ gridColumn: '1 / -1' }}>
               <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Identification</h3>
-              <p><strong>Aadhaar Number:</strong> {profile.aadhaar_number || 'N/A'}</p>
-              <p><strong>PAN Number:</strong> {profile.pan_number || 'N/A'}</p>
-              <p><strong>Health Card Number:</strong> {profile.health_card_number || 'N/A'}</p>
+              <p><strong>Aadhaar Number:</strong> {profile?.aadhaar_number || 'N/A'}</p>
+              <p><strong>PAN Number:</strong> {profile?.pan_number || 'N/A'}</p>
+              <p><strong>Health Card Number:</strong> {profile?.health_card_number || 'N/A'}</p>
             </section>
           </div>
         </div>

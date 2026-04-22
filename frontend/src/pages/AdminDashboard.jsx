@@ -61,6 +61,25 @@ function AdminDashboard() {
     }
   };
 
+  const handleAdminPhotoUpload = async (e, empId) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' };
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+
+    try {
+      await axios.post(`${API_BASE_URL}/api/employees/${empId}/profile-photo`, formData, { headers });
+      alert('Photo updated successfully!');
+      fetchEmployees();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update photo.');
+    }
+  };
+
   return (
     <div className="app-container">
       <Sidebar role="admin" />
@@ -111,6 +130,7 @@ function AdminDashboard() {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
+                    <th style={{ padding: '0.8rem' }}>Photo</th>
                     <th style={{ padding: '0.8rem' }}>Emp ID</th>
                     <th style={{ padding: '0.8rem' }}>Name</th>
                     <th style={{ padding: '0.8rem' }}>Department</th>
@@ -121,6 +141,19 @@ function AdminDashboard() {
                 <tbody>
                   {employees.map(emp => (
                     <tr key={emp.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <td style={{ padding: '0.5rem 0.8rem' }}>
+                        <div style={{ position: 'relative', width: '35px', height: '35px' }}>
+                          <img 
+                            src={emp.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name)}&size=35&background=random`} 
+                            alt="" 
+                            style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover' }} 
+                          />
+                          <label style={{ position: 'absolute', bottom: -2, right: -2, background: 'white', borderRadius: '50%', cursor: 'pointer', display: 'flex', padding: '2px', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--primary-blue)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleAdminPhotoUpload(e, emp.id)} />
+                          </label>
+                        </div>
+                      </td>
                       <td style={{ padding: '0.8rem' }}>{emp.employee_id}</td>
                       <td style={{ padding: '0.8rem' }}>{emp.name}</td>
                       <td style={{ padding: '0.8rem' }}>{emp.department || 'N/A'}</td>

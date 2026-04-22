@@ -26,6 +26,13 @@ function Leaves() {
   const [empLeaveData, setEmpLeaveData] = useState(null); // { leaves, leave_count, name }
   const [newLeaveCount, setNewLeaveCount] = useState(0);
 
+  // Admin Manual Leave entry
+  const [manualSubject, setManualSubject] = useState('');
+  const [manualReason, setManualReason] = useState('');
+  const [manualStartDate, setManualStartDate] = useState('');
+  const [manualEndDate, setManualEndDate] = useState('');
+  const [recording, setRecording] = useState(false);
+
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -119,6 +126,30 @@ function Leaves() {
       setEmpLeaveData(prev => prev ? { ...prev, leave_count: newLeaveCount } : prev);
     } catch (err) {
       alert('Error updating leave count.');
+    }
+  };
+
+  const handleManualLeave = async (e) => {
+    e.preventDefault();
+    if (!selectedEmpId) return alert('Please select an employee.');
+    if (!manualStartDate || !manualEndDate) return alert('Please select dates.');
+    setRecording(true);
+    try {
+      await axios.post(`${API}/leaves/manual-add`, {
+        employeeId: selectedEmpId,
+        subject: manualSubject,
+        reason: manualReason,
+        start_date: manualStartDate,
+        end_date: manualEndDate
+      }, { headers });
+      alert('Leave recorded successfully!');
+      setManualSubject(''); setManualReason(''); setManualStartDate(''); setManualEndDate('');
+      handleSelectEmployee(selectedEmpId);
+      loadAllRequests();
+    } catch (err) {
+      alert('Error recording leave.');
+    } finally {
+      setRecording(false);
     }
   };
 
@@ -278,6 +309,33 @@ function Leaves() {
                       </div>
                     </form>
                     <LeaveCalendar data={empLeaveData.leaves} />
+
+                    <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px dashed #ccc' }}>
+                      <h4 style={{ marginBottom: '1rem', color: '#555' }}>Add Past / Manual Leave</h4>
+                      <form onSubmit={handleManualLeave}>
+                        <div className="input-group">
+                          <label>Subject</label>
+                          <input type="text" value={manualSubject} onChange={e => setManualSubject(e.target.value)} required placeholder="e.g. Past Sick Leave" />
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                          <div className="input-group">
+                            <label>Start Date</label>
+                            <input type="date" value={manualStartDate} onChange={e => setManualStartDate(e.target.value)} required />
+                          </div>
+                          <div className="input-group">
+                            <label>End Date</label>
+                            <input type="date" value={manualEndDate} onChange={e => setManualEndDate(e.target.value)} required />
+                          </div>
+                        </div>
+                        <div className="input-group">
+                          <label>Reason / Note</label>
+                          <input type="text" value={manualReason} onChange={e => setManualReason(e.target.value)} required placeholder="Reason for manual entry" />
+                        </div>
+                        <button type="submit" className="btn" disabled={recording} style={{ width: '100%', backgroundColor: '#6c757d' }}>
+                          {recording ? 'Recording...' : 'Record Manual Leave'}
+                        </button>
+                      </form>
+                    </div>
                   </div>
                 )}
               </div>

@@ -9,5 +9,6 @@ router.get('/requests', verifyToken, isAdmin, leaveController.getLeaveRequests);
 router.put('/:id/status', verifyToken, isAdmin, leaveController.updateLeaveStatus);
 router.get('/employee/:employeeId', verifyToken, leaveController.getEmployeeLeaveDetails);
 router.put('/employee/:employeeId/count', verifyToken, isAdmin, leaveController.updateLeaveCount);
+router.post('/manual-add', verifyToken, isAdmin, leaveController.addManualLeave);
 
 module.exports = router;

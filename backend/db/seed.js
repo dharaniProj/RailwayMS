@@ -155,14 +155,14 @@ async function seed() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS salary_history (
         id           SERIAL PRIMARY KEY,
-        emp_id       INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        employee_id  INTEGER REFERENCES employees(id) ON DELETE CASCADE,
         month        INTEGER NOT NULL,
         year         INTEGER NOT NULL,
         gross_salary NUMERIC(12,2),
         deductions   NUMERIC(12,2),
         net_salary   NUMERIC(12,2),
         generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(emp_id, month, year)
+        UNIQUE(employee_id, month, year)
       )
     `);
 
@@ -170,30 +170,32 @@ async function seed() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS notifications (
         id         SERIAL PRIMARY KEY,
-        emp_id     INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        user_id    INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        title      VARCHAR(255),
         message    TEXT NOT NULL,
         type       VARCHAR(50) DEFAULT 'general',
         is_read    BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+      );
     `);
 
     // Ensure transfers table exists
     await pool.query(`
       CREATE TABLE IF NOT EXISTS transfers (
         id                  SERIAL PRIMARY KEY,
-        emp_id              INTEGER REFERENCES employees(id) ON DELETE CASCADE,
-        current_location    VARCHAR(100),
-        requested_location  VARCHAR(100),
+        employee_id         INTEGER REFERENCES employees(id) ON DELETE CASCADE,
+        from_location       VARCHAR(100),
+        to_location         VARCHAR(100),
         reason              TEXT,
         status              VARCHAR(20) DEFAULT 'pending',
-        applied_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        effective_date      DATE,
+        created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
     // Ensure documents table has the right columns
     await pool.query(`ALTER TABLE documents ADD COLUMN IF NOT EXISTS doc_id SERIAL`).catch(() => {});
-    await pool.query(`ALTER TABLE documents ADD COLUMN IF NOT EXISTS emp_id INTEGER REFERENCES employees(id)`).catch(() => {});
+    await pool.query(`ALTER TABLE documents ADD COLUMN IF NOT EXISTS employee_id INTEGER REFERENCES employees(id)`).catch(() => {});
     await pool.query(`ALTER TABLE documents ADD COLUMN IF NOT EXISTS category VARCHAR(100) DEFAULT 'Other'`).catch(() => {});
     await pool.query(`ALTER TABLE documents ADD COLUMN IF NOT EXISTS file_name TEXT`).catch(() => {});
     await pool.query(`ALTER TABLE documents ADD COLUMN IF NOT EXISTS file_type VARCHAR(50)`).catch(() => {});
@@ -272,9 +274,9 @@ async function seed() {
       const { gross, deductions, net } = calcSalary(e.salary);
       for (const { month, year } of months) {
         await pool.query(`
-          INSERT INTO salary_history (emp_id, month, year, gross_salary, deductions, net_salary)
+          INSERT INTO salary_history (employee_id, month, year, gross_salary, deductions, net_salary)
           VALUES ($1, $2, $3, $4, $5, $6)
-          ON CONFLICT (emp_id, month, year) DO NOTHING
+          ON CONFLICT (employee_id, month, year) DO NOTHING
         `, [empDbId, month, year, gross, deductions, net]);
       }
     }
@@ -310,22 +312,10 @@ async function seed() {
     ];
 
     for (const l of leaveData) {
-      // Check if leaves table uses 'employee_id' or 'emp_id'
-      try {
-        await pool.query(`
-          INSERT INTO leaves (employee_id, start_date, end_date, reason, status)
-          VALUES ($1, $2, $3, $4, 'pending')
-        `, [l.id, l.start, l.end, l.reason]);
-      } catch {
-        try {
-          await pool.query(`
-            INSERT INTO leaves (emp_id, subject, start_date, end_date, reason, status)
-            VALUES ($1, $2, $3, $4, $5, 'pending')
-          `, [l.id, l.subject, l.start, l.end, l.reason]);
-        } catch (err2) {
-          console.log(`   Skipped leave for emp ${l.id}: ${err2.message}`);
-        }
-      }
+      await pool.query(`
+        INSERT INTO leaves (employee_id, subject, start_date, end_date, reason, status)
+        VALUES ($1, $2, $3, $4, $5, 'pending')
+      `, [l.id, l.subject, l.start, l.end, l.reason]);
     }
     console.log('   3 pending leave requests created.');
 

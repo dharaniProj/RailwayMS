@@ -84,8 +84,8 @@ exports.updateLeaveStatus = async (req, res) => {
 
         res.json(leave);
     } catch (error) {
-        console.error('Error updating leave status:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error('[LeaveController] Status update failed. Error details:', error);
+        res.status(500).json({ message: 'Server error: ' + error.message });
     }
 };
 
@@ -116,6 +116,38 @@ exports.updateLeaveCount = async (req, res) => {
         res.json({ message: 'Leave count updated successfully' });
     } catch (error) {
         console.error('Error updating leave count:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.addManualLeave = async (req, res) => {
+    try {
+        const { employeeId, subject, reason, start_date, end_date } = req.body;
+        
+        const result = await db.query(
+            'INSERT INTO leaves (employee_id, subject, reason, start_date, end_date, status) VALUES ($1, $2, $3, $4, $5, \'approved\') RETURNING *',
+            [employeeId, subject, reason, start_date, end_date]
+        );
+
+        // Deduct from leave count
+        const start = new Date(start_date);
+        const end = new Date(end_date);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        
+        await db.query('UPDATE employees SET leave_count = leave_count - $1 WHERE id = $2', [diffDays, employeeId]);
+
+        // Notify Employee
+        await createNotification(
+            employeeId, 
+            'Leave Recorded', 
+            `A leave for "${subject}" has been manually recorded by the administrator.`, 
+            'leave'
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding manual leave:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };

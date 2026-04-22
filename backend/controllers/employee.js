@@ -222,3 +222,41 @@ exports.updateAdminProfile = async (req, res) => {
     }
 };
 
+exports.updateProfilePhoto = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const requester = req.user;
+
+        // Only Admin or the employee themselves can update the photo
+        if (requester.role !== 'admin' && requester.id !== parseInt(id)) {
+            return res.status(403).json({ message: 'Permission denied.' });
+        }
+
+        if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
+
+        // Reuse the upload logic
+        const uploadFileToCloud = (buffer, mimetype, folder) => {
+            const cloudinary = require('../config/cloudinary');
+            const { Readable } = require('stream');
+            const resourceType = ['image/jpeg', 'image/png'].includes(mimetype) ? 'image' : 'raw';
+            return new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { folder, resource_type: resourceType },
+                    (err, result) => err ? reject(err) : resolve(result)
+                );
+                Readable.from(buffer).pipe(stream);
+            });
+        };
+
+        const uploadResult = await uploadFileToCloud(req.file.buffer, req.file.mimetype, 'employee-profiles');
+        const profilePhotoUrl = uploadResult.secure_url;
+
+        await db.query('UPDATE employees SET profile_photo_url = $1 WHERE id = $2', [profilePhotoUrl, id]);
+
+        res.json({ message: 'Profile photo updated successfully', url: profilePhotoUrl });
+    } catch (error) {
+        console.error('Error updating profile photo:', error);
+        res.status(500).json({ message: 'Server error: ' + error.message });
+    }
+};
+
