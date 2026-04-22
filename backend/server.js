@@ -4,25 +4,34 @@ const cors = require('cors');
 
 const app = express();
 
-// CORS — open to all if CORS_ORIGIN not set (initial setup), restricted once set
-const corsOptions = process.env.CORS_ORIGIN
-  ? {
-      origin: (origin, callback) => {
-        const allowed = [
-          'http://localhost:5173',
-          'http://localhost:3000',
-          ...process.env.CORS_ORIGIN.split(',').map(o => o.trim()),
-        ];
-        // Allow requests with no origin (Postman, curl, server-to-server)
-        if (!origin || allowed.includes(origin)) return callback(null, true);
-        console.log('[CORS] Blocked origin:', origin, '| Allowed:', allowed.join(', '));
-        callback(new Error('CORS: origin not allowed'));
-      },
-      credentials: true,
-    }
-  : { origin: true, credentials: true }; // Allow all when not configured
+// CORS — allow localhost, production Vercel URL, and all Vercel preview deployments
+const PRODUCTION_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 
-app.use(cors(corsOptions));
+// Regex: matches all Vercel preview + production URLs for this project
+// e.g. railway-ms.vercel.app  OR  railway-abc123-dharaniprojs-projects.vercel.app
+const VERCEL_PATTERN = /^https:\/\/(railway-ms|railway-[a-z0-9]+-dharaniprojs-projects)\.vercel\.app$/;
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow no-origin requests (Postman, curl, mobile apps)
+    if (!origin) return callback(null, true);
+    // Allow localhost
+    if (PRODUCTION_ORIGINS.includes(origin)) return callback(null, true);
+    // Allow all Vercel preview/production URLs for this project
+    if (VERCEL_PATTERN.test(origin)) return callback(null, true);
+    // Allow any extra origins set via CORS_ORIGIN env var (comma-separated)
+    if (process.env.CORS_ORIGIN) {
+      const extra = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+      if (extra.includes(origin)) return callback(null, true);
+    }
+    console.log('[CORS] Blocked:', origin);
+    callback(new Error('CORS: origin not allowed'));
+  },
+  credentials: true,
+}));
 
 app.use(express.json());
 
