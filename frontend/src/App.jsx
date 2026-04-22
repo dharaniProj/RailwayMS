@@ -13,7 +13,6 @@ import Leaves from './pages/Leaves';
 import Transfers from './pages/Transfers';
 import Documents from './pages/Documents';
 import AdminProfile from './pages/AdminProfile';
-import RailwayPass from './pages/RailwayPass';
 
 // ProtectedRoute evaluates localStorage exactly when the route is matched
 const ProtectedRoute = ({ children, role }) => {
@@ -71,7 +70,6 @@ function App() {
         <Route path="/admin/leaves" element={<ProtectedRoute role="admin"><Leaves /></ProtectedRoute>} />
         <Route path="/admin/transfers" element={<ProtectedRoute role="admin"><Transfers /></ProtectedRoute>} />
         <Route path="/admin/documents" element={<ProtectedRoute role="admin"><Documents /></ProtectedRoute>} />
-        <Route path="/admin/railway-pass" element={<ProtectedRoute role="admin"><RailwayPass /></ProtectedRoute>} />
         <Route path="/admin/profile" element={<ProtectedRoute role="admin"><AdminProfile /></ProtectedRoute>} />
         
         {/* Employee Routes */}
@@ -83,7 +81,6 @@ function App() {
         <Route path="/employee/leaves" element={<ProtectedRoute role="employee"><Leaves /></ProtectedRoute>} />
         <Route path="/employee/transfers" element={<ProtectedRoute role="employee"><Transfers /></ProtectedRoute>} />
         <Route path="/employee/documents" element={<ProtectedRoute role="employee"><Documents /></ProtectedRoute>} />
-        <Route path="/employee/railway-pass" element={<ProtectedRoute role="employee"><RailwayPass /></ProtectedRoute>} />
 
         {/* Fallback */}
         <Route path="/" element={<RootRedirect />} />

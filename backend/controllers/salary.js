@@ -3,7 +3,7 @@ const db = require('../config/db');
 exports.getEmployeeSalaryHistory = async (req, res) => {
     try {
         const { employeeId } = req.params;
-        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY month_year DESC', [employeeId]);
+        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY payment_date DESC', [employeeId]);
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching salary history:', error);
@@ -14,7 +14,7 @@ exports.getEmployeeSalaryHistory = async (req, res) => {
 exports.getMySalaryHistory = async (req, res) => {
     try {
         const userId = req.user.id;
-        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY month_year DESC', [userId]);
+        const result = await db.query('SELECT * FROM salary_history WHERE employee_id = $1 ORDER BY payment_date DESC', [userId]);
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching own salary history:', error);
