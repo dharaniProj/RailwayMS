@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const meetingController = require('../controllers/meeting');
-const authMiddleware = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware');
 const multer = require('multer');
 
 // Configure multer for memory storage
